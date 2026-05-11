@@ -1,0 +1,34 @@
+# Backups
+_backup/
+*.bak
+*_backup_*.html
+*_backup_*.py
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependências (futuro)
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# Build (futuro)
+dist/
+build/
+
+# Claude / hooks locais
+.claude/local.settings.json

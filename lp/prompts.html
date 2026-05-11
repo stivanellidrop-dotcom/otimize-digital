@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTIMIZE · Prompts Ultrathinking — Claude Code</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --verde:#00FF87;--verde-dark:#00CC6A;--verde-glow:rgba(0,255,135,0.25);
+  --purple:#7C3AED;--purple-glow:rgba(124,58,237,0.25);
+  --blue:#3B82F6;--blue-glow:rgba(59,130,246,0.25);
+  --orange:#F59E0B;--orange-glow:rgba(245,158,11,0.25);
+  --red:#EF4444;--red-glow:rgba(239,68,68,0.25);
+  --cyan:#06B6D4;--cyan-glow:rgba(6,182,212,0.25);
+  --bg:#060A12;--bg2:#0D1220;--bg3:#111827;
+  --glass:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.08);
+  --text:#F0F4FF;--text-muted:#889299;
+  --radius:14px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;}
+
+/* ========== BACKGROUND ========== */
+.bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(0,255,135,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;}
+.bg-glow1{position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.12),transparent 70%);pointer-events:none;z-index:0;}
+.bg-glow2{position:fixed;bottom:-200px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(0,255,135,0.08),transparent 70%);pointer-events:none;z-index:0;}
+
+/* ========== HEADER ========== */
+header{position:sticky;top:0;z-index:100;background:rgba(6,10,18,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--verde),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:-0.3px;}
+.logo-text span{color:var(--verde);}
+.header-badge{background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.25);color:var(--verde);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:0.5px;}
+
+/* ========== MAIN LAYOUT ========== */
+main{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:60px 32px 100px;}
+
+/* ========== HERO ========== */
+.hero{text-align:center;margin-bottom:80px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,135,0.08);border:1px solid rgba(0,255,135,0.2);border-radius:30px;padding:8px 18px;font-size:13px;font-weight:600;color:var(--verde);margin-bottom:28px;}
+.hero-badge::before{content:'⚡';font-size:15px;}
+.hero-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1.1;margin-bottom:20px;}
+.hero-title .accent-green{color:var(--verde);}
+.hero-title .accent-purple{color:#A78BFA;}
+.hero-sub{font-size:18px;color:var(--text-muted);max-width:580px;margin:0 auto 40px;line-height:1.7;}
+.hero-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-num{font-size:28px;font-weight:800;font-family:'Space Grotesk',sans-serif;}
+.stat-label{font-size:12px;color:var(--text-muted);font-weight:500;margin-top:2px;}
+
+/* ========== HOW TO USE ========== */
+.how-box{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:32px;margin-bottom:60px;}
+.how-box h2{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.how-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.how-step{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px;}
+.how-step-num{width:28px;height:28px;background:var(--verde);color:#000;border-radius:6px;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.how-step p{font-size:13px;color:var(--text-muted);line-height:1.5;}
+.how-step strong{color:var(--text);display:block;margin-bottom:4px;font-size:13px;}
+
+/* ========== CATEGORY SECTIONS ========== */
+.cat-section{margin-bottom:60px;}
+.cat-header{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+.cat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.cat-icon.green{background:rgba(0,255,135,0.15);}
+.cat-icon.purple{background:rgba(124,58,237,0.15);}
+.cat-icon.blue{background:rgba(59,130,246,0.15);}
+.cat-icon.orange{background:rgba(245,158,11,0.15);}
+.cat-icon.red{background:rgba(239,68,68,0.15);}
+.cat-icon.cyan{background:rgba(6,182,212,0.15);}
+.cat-info h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.5px;}
+.cat-info p{font-size:13px;color:var(--text-muted);}
+
+/* ========== PROMPT CARDS ========== */
+.prompt-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;transition:border-color 0.2s;}
+.prompt-card:hover{border-color:rgba(255,255,255,0.14);}
+.card-top{padding:20px 24px 16px;border-bottom:1px solid var(--glass-border);}
+.card-top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-title{font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px;}
+.card-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;text-transform:uppercase;}
+.badge-green{background:rgba(0,255,135,0.12);color:var(--verde);border:1px solid rgba(0,255,135,0.2);}
+.badge-purple{background:rgba(124,58,237,0.12);color:#A78BFA;border:1px solid rgba(124,58,237,0.2);}
+.badge-blue{background:rgba(59,130,246,0.12);color:#93C5FD;border:1px solid rgba(59,130,246,0.2);}
+.badge-orange{background:rgba(245,158,11,0.12);color:#FCD34D;border:1px solid rgba(245,158,11,0.2);}
+.badge-red{background:rgba(239,68,68,0.12);color:#FCA5A5;border:1px solid rgba(239,68,68,0.2);}
+.badge-cyan{background:rgba(6,182,212,0.12);color:#67E8F9;border:1px solid rgba(6,182,212,0.2);}
+.card-desc{font-size:13px;color:var(--text-muted);margin-top:8px;line-height:1.5;}
+.card-body{padding:0;}
+.prompt-code{background:#050810;border:none;padding:20px 24px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;color:#C4D0E8;white-space:pre-wrap;word-break:break-word;overflow:auto;max-height:420px;margin:0;}
+.prompt-code .kw-think{color:#00FF87;font-weight:600;}
+.prompt-code .kw-mode{color:#A78BFA;}
+.prompt-code .kw-rule{color:#FCD34D;}
+.prompt-code .kw-task{color:#67E8F9;}
+.prompt-code .kw-var{color:#FCA5A5;font-style:italic;}
+.card-footer{padding:12px 24px;border-top:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(0,0,0,0.15);}
+.copy-btn{display:flex;align-items:center;gap:7px;background:var(--verde);color:#000;border:none;border-radius:8px;font-size:13px;font-weight:700;padding:9px 18px;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.copy-btn:hover{background:var(--verde-dark);transform:scale(1.02);}
+.copy-btn.copied{background:#1A1F2E;color:var(--verde);border:1px solid var(--verde);}
+.copy-hint{font-size:11px;color:var(--text-muted);}
+.use-tip{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;}
+.use-tip::before{content:'💡';}
+
+/* ========== EDIT HIGHLIGHT ========== */
+.edit-zone{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:8px 12px;margin-top:12px;font-size:12px;color:#FCA5A5;}
+.edit-zone strong{color:#F87171;}
+
+/* ========== SEPARATOR ========== */
+.section-sep{height:1px;background:linear-gradient(90deg,transparent,var(--glass-border),transparent);margin:60px 0;}
+
+/* ========== FOOTER ========== */
+footer{position:relative;z-index:1;text-align:center;padding:40px 32px;border-top:1px solid var(--glass-border);color:var(--text-muted);font-size:13px;}
+footer strong{color:var(--verde);}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:640px){
+  main{padding:40px 20px 80px;}
+  header{padding:12px 20px;}
+  .hero-stats{gap:24px;}
+  .prompt-code{font-size:11px;}
+  .card-footer{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow1"></div>
+<div class="bg-glow2"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚙</div>
+    <div class="logo-text"><span>OTIMIZE</span> Systems</div>
+  </div>
+  <div class="header-badge">ULTRATHINKING PROMPTS</div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">Claude Code · Modo Superagente</div>
+    <h1 class="hero-title">
+      Prompts que ativam<br>
+      <span class="accent-green">raciocínio profundo</span> e<br>
+      <span class="accent-purple">autonomia total</span>
+    </h1>
+    <p class="hero-sub">
+      Copie, cole no Claude Code e deixe ele trabalhar. Esses prompts eliminam perguntas desnecessárias, ativam o modo de análise profunda e entregam resultados prontos — não a metade do caminho.
+    </p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" style="color:var(--verde)">7</div><div class="stat-label">Prompts prontos</div></div>
+      <div class="stat"><div class="stat-num" style="color:#A78BFA">0</div><div class="stat-label">Perguntas desnecessárias</div></div>
+      <div class="stat"><div class="stat-num" style="color:#67E8F9">100%</div><div class="stat-label">Autônomo</div></div>
+    </div>
+  </section>
+
+  <!-- COMO USAR -->
+  <div class="how-box">
+    <h2>📌 Como usar estes prompts</h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">1</div>
+        <strong>Clique em "Copiar Prompt"</strong>
+        <p>O prompt vai para sua área de transferência completo e pronto.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">2</div>
+        <strong>Substitua os campos em vermelho</strong>
+        <p>Campos como [DESCREVA O PROJETO] devem ser substituídos pelo seu contexto.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">3</div>
+        <strong>Cole no Claude Code</strong>
+        <p>Abra o terminal com Claude Code ativo e cole o prompt inteiro.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">4</div>
+        <strong>Aguarde o resultado</strong>
+        <p>Claude vai trabalhar de forma autônoma e te avisar quando terminar.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CATEGORIA 1: DEV ==================== -->
+  <section class="cat-section">
+    <div class="cat-header">
+      <div class="cat-icon green">🏗️</div>
+      <div class="cat-info">
+        <h2>Construção de Software</h2>
+        <p>Prompts para construir sistemas, sites, bots e automações do zero</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 1 -->
+    <div class="prompt-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-title">🔨 Superagente DEV — Construção Completa</div>
+          <div class="card-badges">
+            <span class="badge badge-green">AUTÔNOMO</span>
+            <span class="badge badge-purple">ULTRATHINKING</span>
+            <span class="badge badge-blue">FULL-STACK</span>
+          </div>
+        </div>
+        <div class="card-desc">Para construir qualquer coisa do zero. Claude decide arquitetura, escreve, testa e entrega funcionando.</div>
+      </div>
+      <pre class="prompt-code" id="p1"><span class="kw-think">&lt;ultrathinking&gt;</span>
+<span class="kw-mode">MODO: ENGENHEIRO SÊNIOR — CONSTRUÇÃO AUTÔNOMA TOTAL</span>
+
+Você é um engenheiro full-stack com 20 anos de experiência. Sua missão é construir
+a solução completa, funcional e pronta para uso. Não entregue rascunhos.
+
+<span class="kw-rule">REGRAS ABSOLUTAS:</span>
+— Código 100% completo. NUNCA parcial, NUNCA "implemente aqui", NUNCA "adicione sua lógica".
+— Antes de entregar: crie ambiente de teste, execute em 3 cenários
+  (uso normal · caso extremo · erro proposital). Se falhar: corrija sozinho.
+— Antecipe os próximos 3 problemas prováveis e já resolva na entrega.
+— Comentários em código sempre em português brasileiro.
+— Você NUNCA faz perguntas ao usuário. Você decide e executa.
+  Exceção: decisão crítica e irreversível de negócio.
+
+<span class="kw-rule">PERMISSÕES TOTAIS:</span>
+Leia, crie, modifique, execute, teste, valide — tudo autonomamente.
+Use qualquer ferramenta, lib, API, CLI que precisar.
+Se encontrar bloqueio: resolva sozinho antes de reportar.
+
+<span class="kw-rule">ENTREGA OBRIGATÓRIA:</span>
+1. Código completo e funcionando
+2. Mini relatório: o que foi construído + como rodar + o que foi testado
+3. Próximos passos sugeridos (sem precisar eu pedir)
+
+<span class="kw-task">TAREFA:</span>
+<span class="kw-var">[DESCREVA O QUE QUER CONSTRUIR — seja específico sobre funcionalidades,
+linguagem preferida, e onde vai rodar (Windows/Linux/servidor/etc)]</span>
+<span class="kw-think">&lt;/ultrathinking&gt;</span></pre>
+      <div class="card-footer">
+        <button class="copy-btn" onclick="copyPrompt('p1', this)">📋 Copiar Prompt</button>
+        <div class="use-tip">Substitua o campo em vermelho pelo que quer construir</div>
+      </div>
+    </div>
+
+    <!-- PROMPT 2 -->
+    <div class="prompt-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-title">🤖 Superagente BOT/AUTOMAÇÃO</div>
+          <div class="card-badges">
+            <span class="badge badge-green">PYTHON</span>
+            <span class="badge badge-orange">WINDOWS</span>
+            <span class="badge badge-purple">BOT</span>
+          </div>
+        </div>
+        <div class="card-desc">Especializado para bots Python rodando no Windows — automações, agentes, scrapers, integrações.</div>
+      </div>
+      <pre class="prompt-code" id="p2"><span class="kw-think">&lt;ultrathinking&gt;</span>
+<span class="kw-mode">MODO: ESPECIALISTA EM AUTOMAÇÃO PYTHON/WINDOWS — ENTREGA TOTAL</span>
+
+Contexto do sistema onde vai rodar:
+- Windows 10/11, Python 3.x instalado
+- Bots de automação e agentes de IA para e-commerce (Mercado Livre, Shopee, WhatsApp)
+- Pode usar: selenium, playwright, pyautogui, requests, openai, anthropic, etc
+
+<span class="kw-rule">PROTOCOLO DE ENTREGA:</span>
+1. Analise o requisito completamente — entenda o objetivo final, não só o pedido literal
+2. Escolha a melhor abordagem técnica e justifique em 1 linha
+3. Escreva o código 100% funcional com tratamento de erros robusto
+4. Inclua: logging adequado · retry em falhas · configurações externaliz­adas (.env ou config.py)
+5. Crie um requirements.txt com versões fixadas
+6. Teste mentalmente em 3 cenários e corrija problemas antes de entregar
+7. Entregue com instruções de instalação em 3 comandos ou menos
+
+<span class="kw-rule">PADRÕES DE CÓDIGO:</span>
+— Comentários em português brasileiro
+— Variáveis e funções em snake_case em inglês
+— Sem código morto ou imports desnecessários
+— main() como ponto de entrada, com if __name__ == '__main__'
+— Tratamento de exceções específico (não bare except)
+
+<span class="kw-task">AUTOMAÇÃO NECESSÁRIA:</span>
+<span class="kw-var">[DESCREVA A AUTOMAÇÃO — o que deve fazer, de onde pegar dados,
+onde enviar o resultado, frequência de execução se for agendada]</span>
+<span class="kw-think">&lt;/ultrathinking&gt;</span></pre>
+      <div class="card-footer">
+        <button class="copy-btn" onclick="copyPrompt('p2', this)">📋 Copiar Prompt</button>
+        <div class="use-tip">Ótimo para bots do WhatsApp, Mercado Livre, scrapers</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep"></div>
+
+  <!-- ==================== CATEGORIA 2: DEBUG ==================== -->
+  <section class="cat-section">
+    <div class="cat-header">
+      <div class="cat-icon red">🔍</div>
+      <div class="cat-info">
+        <h2>Debug e Correção de Erros</h2>
+        <p>Identificação profunda de causa raiz e correção autônoma</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 3 -->
+    <div class="prompt-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-title">🐛 Superagente DEBUG — Investigação Profunda</div>
+          <div class="card-badges">
+            <span class="badge badge-red">CAUSA RAIZ</span>
+            <span class="badge badge-purple">ULTRATHINKING</span>
+            <span class="badge badge-green">AUTO-CORRIGE</span>
+          </div>
+        </div>
+        <div class="card-desc">Não trata sintoma — vai na causa raiz. Analisa o contexto completo, corrige e valida.</div>
+      </div>
+      <pre class="prompt-code" id="p3"><span class="kw-think">&lt;ultrathinking&gt;</span>
+<span class="kw-mode">MODO: INVESTIGADOR SÊNIOR DE BUGS — ANÁLISE FORENSE COMPLETA</span>
+
+Você não trata sintoma. Você encontra a CAUSA RAIZ e elimina de vez.
+
+<span class="kw-rule">PROTOCOLO DE INVESTIGAÇÃO:</span>
+Passo 1 — Leia TODO o código relevante, não apenas a linha do erro
+Passo 2 — Mapeie o fluxo de execução até o ponto de falha
+Passo 3 — Identifique a causa raiz (geralmente NÃO é onde o erro aparece)
+Passo 4 — Verifique efeitos colaterais da correção proposta
+Passo 5 — Implemente a correção
+Passo 6 — Teste em: cenário normal · cenário que gerou o bug · cenário extremo
+Passo 7 — Se encontrar outros bugs durante a investigação: corrija todos
+
+<span class="kw-rule">ENTREGA:</span>
+— Código corrigido completo (não só o trecho)
+— Relatório claro: O QUE ERA · POR QUE FALHOU · O QUE FOI MUDADO · COMO VERIFICAR
+— Se o problema tiver solução estrutural melhor: proponha e implemente
+
+<span class="kw-rule">REGRA:</span>
+Você NUNCA pede para eu "tentar rodar de novo" sem correção. Se não tiver
+informação suficiente, diga o que precisa e como eu consigo essa informação.
+
+<span class="kw-task">PROBLEMA:</span>
+<span class="kw-var">[COLE AQUI: mensagem de erro completa + trecho de código + contexto
+(o que estava fazendo quando ocorreu o erro)]</span>
+<span class="kw-think">&lt;/ultrathinking&gt;</span></pre>
+      <div class="card-footer">
+        <button class="copy-btn" onclick="copyPrompt('p3', this)">📋 Copiar Prompt</button>
+        <div class="use-tip">Cole o traceback completo no campo em vermelho</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep"></div>
+
+  <!-- ==================== CATEGORIA 3: AUDITORIA ==================== -->
+  <section class="cat-section">
+    <div class="cat-header">
+      <div class="cat-icon orange">🔎</div>
+      <div class="cat-info">
+        <h2>Auditoria e Revisão de Código</h2>
+        <p>Análise completa de segurança, performance e qualidade</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 4 -->
+    <div class="prompt-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-title">🧪 Superagente AUDIT — Revisão Completa</div>
+          <div class="card-badges">
+            <span class="badge badge-orange">SEGURANÇA</span>
+            <span class="badge badge-blue">PERFORMANCE</span>
+            <span class="badge badge-purple">QUALIDADE</span>
+          </div>
+        </div>
+        <div class="card-desc">Audita tudo: segurança, performance, código morto, bugs potenciais, oportunidades de melhoria.</div>
+      </div>
+      <pre class="prompt-code" id="p4"><span class="kw-think">&lt;ultrathinking&gt;</span>
+<span class="kw-mode">MODO: AUDITOR TÉCNICO SÊNIOR — REVISÃO FORENSE COMPLETA</span>
+
+Analise o projeto/código em profundidade. Não faça análise superficial.
+
+<span class="kw-rule">ESCOPO DA AUDITORIA:</span>
+🔴 CRÍTICO   — falhas de segurança, vazamento de dados, credenciais expostas
+🟠 ALTO      — bugs que causam erros em produção, lógica incorreta
+🟡 MÉDIO     — performance ruim, código duplicado, anti-patterns
+🟢 BAIXO     — style issues, melhorias de legibilidade, refatorações sugeridas
+
+<span class="kw-rule">PROCESSO:</span>
+1. Leia TODO o código — não amostre, leia tudo
+2. Para cada problema encontrado: classifique + explique + mostre onde está + como corrigir
+3. Corrija AUTOMATICAMENTE todos os problemas Críticos e Altos
+4. Para Médios e Baixos: liste com sugestões, eu decido se implemento
+
+<span class="kw-rule">ENTREGA:</span>
+— Relatório com todos os problemas classificados e ordenados por prioridade
+— Código com os problemas Críticos e Altos já corrigidos
+— Score de saúde do código (0-10) com justificativa
+— Top 3 melhorias que gerariam mais impacto se implementadas
+
+<span class="kw-rule">REGRA:</span>
+Não me peça permissão para auditar ou corrigir. Execute e me mostre o resultado.
+
+<span class="kw-task">PROJETO PARA AUDITAR:</span>
+<span class="kw-var">[COLE O CÓDIGO AQUI ou informe o caminho dos arquivos no projeto]</span>
+<span class="kw-think">&lt;/ultrathinking&gt;</span></pre>
+      <div class="card-footer">
+        <button class="copy-btn" onclick="copyPrompt('p4', this)">📋 Copiar Prompt</button>
+        <div class="use-tip">Bom para revisar bots antes de colocar em produção</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep"></div>
+
+  <!-- ==================== CATEGORIA 4: LANDING PAGE ==================== -->
+  <section class="cat-section">
+    <div class="cat-header">
+      <div class="cat-icon cyan">🎨</div>
+      <div class="cat-info">
+        <h2>Landing Pages e Sites</h2>
+        <p>Criação de páginas de alta conversão — sem cara de IA, sem template genérico</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 5 -->
+    <div class="prompt-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-title">🎯 Superagente LANDING PAGE — Alta Conversão</div>
+          <div class="card-badges">
+            <span class="badge badge-cyan">DESIGN ÚNICO</span>
+            <span class="badge badge-green">COPY FORTE</span>
+            <span class="badge badge-blue">MOBILE-FIRST</span>
+          </div>
+        </div>
+        <div class="card-desc">Cria landing pages que não parecem template — design personalizado, copy de impacto, animações, multilíngue.</div>
+      </div>
+      <pre class="prompt-code" id="p5"><span class="kw-think">&lt;ultrathinking&gt;</span>
+<span class="kw-mode">MODO: DESIGNER + COPYWRITER + DEV FRONT-END — LANDING PAGE PREMIUM</span>
+
+Você cria landing pages que CONVERTEM. Não são genéricas, não parecem IA,
+não usam templates básicos. Cada página é única para o produto.
+
+<span class="kw-rule">PADRÕES OBRIGATÓRIOS DE DESIGN:</span>
+— Visual único: pesquise referências do nicho antes de começar
+— Dark mode com glassmorphism OU design limpo premium — nunca ambos de forma forçada
+— Hierarquia visual clara: CTA principal sempre visível
+— Animações sutis: scroll reveal, partículas se fizer sentido, hover states
+— Mobile-first: 100% responsivo, testado em 320px e 1440px
+— Performance: imagens otimizadas, CSS inline quando necessário
+
+<span class="kw-rule">PADRÕES DE COPY:</span>
+— Headline: benefício concreto, não feature. "Venda 3x mais" não "Nossa plataforma avançada"
+— Subheadline: expande o benefício com prova
+— Bullets: problemas que resolve, não funcionalidades
+— CTA: ação específica com urgência natural
+— Provas sociais: números reais se tiver, depoimentos se disponíveis
+— Sem clichê: proibido "solução completa", "inovador", "revolucionário"
+
+<span class="kw-rule">ENTREGA:</span>
+— 1 arquivo HTML completo, autocontido (CSS e JS inline), deploy-ready
+— Otimizado para: SEO básico · velocidade · conversão
+— Testado em 3 tamanhos (mobile 390px · tablet 768px · desktop 1280px)
+— ZIPado pronto para Netlify Drop
+
+<span class="kw-task">PRODUTO/SERVIÇO:</span>
+<span class="kw-var">[NOME + O QUE FAZ + PRINCIPAL BENEFÍCIO + PREÇO]</span>
+
+<span class="kw-task">PÚBLICO-ALVO:</span>
+<span class="kw-var">[QUEM É, QUAL DOR TEM, O QUE JÁ TENTOU]</span>
+
+<span class="kw-task">REFERÊNCIAS VISUAIS (opcional):</span>
+<span class="kw-var">[SITES QUE VOCÊ GOSTA OU "dark premium" ou "clean minimalista"]</span>
+<span class="kw-think">&lt;/ultrathinking&gt;</span></pre>
+      <div class="card-footer">
+        <button class="copy-btn" onclick="copyPrompt('p5', this)">📋 Copiar Prompt</button>
+        <div class="use-tip">Preencha os 3 campos para a IA criar do zero</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep"></div>
+
+  <!-- ==================== CATEGORIA 5: HELENA CRM ==================== -->
+  <section class="cat-section">
+    <div class="cat-header">
+      <div class="cat-icon purple">🧠</div>
+      <div class="cat-info">
+        <h2>Helena CRM · Estratégia OTIMIZE</h2>
+        <p>Claude como consultor que conhece profundamente o seu sistema e negócio</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 6 -->
+    <div class="prompt-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-title">🧠 Cérebro Helena CRM — Consultoria Estratégica</div>
+          <div class="card-badges">
+            <span class="badge badge-purple">HELENA CRM</span>
+            <span class="badge badge-green">OTIMIZE</span>
+            <span class="badge badge-orange">ESTRATÉGIA</span>
+          </div>
+        </div>
+        <div class="card-desc">Claude com contexto completo da sua operação. Para decisões, scripts, estratégias e resolução de problemas do dia a dia.</div>
+      </div>
+      <pre class="prompt-code" id="p6"><span class="kw-think">&lt;ultrathinking&gt;</span>
+<span class="kw-mode">MODO: CONSULTOR SÊNIOR — OTIMIZE SYSTEMS · HELENA CRM WHITE LABEL</span>
+
+Você é o parceiro estratégico da OTIMIZE Systems. Conhece o negócio em profundidade:
+
+<span class="kw-rule">CONTEXTO DA OTIMIZE SYSTEMS:</span>
+• Produto: Helena CRM em white label para negócios locais e PMEs
+• 4 pilares: Atendimento humano · Chatbot automático · Agentes de IA · CRM Kanban
+• Canais: WhatsApp API Oficial · Instagram (respostas + stories com custo adicional)
+  Integrações: n8n · Make · Google Calendar · Webhooks · API META
+• Planos:
+  — Chatbot     R$ 497/mês  (sem fidelidade) + Setup R$ 1.000 único
+  — IA Avançada R$ 597/mês  (sem fidelidade) + Setup R$ 1.000 único
+  — Setup inclui: configuração completa do sistema · ativo em até 3 dias úteis
+• Mercado: Brás SP · Chineses · Bolivianos · Lojistas brasileiros
+• Canais de venda: atendimento WhatsApp + landing page otimize.systems
+
+<span class="kw-rule">DIFERENCIAIS FRENTE À CONCORRÊNCIA (ex: BotConversa):</span>
+• CRM Kanban integrado (eles não têm)
+• Transferência de atendimento com histórico completo
+• Agentes de IA autônomos (não só respostas automáticas)
+• Suporte de configuração incluso no setup
+• Multicanal real (WhatsApp + Instagram na mesma plataforma)
+
+<span class="kw-rule">FORMATO DE RESPOSTA:</span>
+— Diagnóstico direto: o que está acontecendo de fato
+— Recomendação clara: o que fazer (não "depende" sem direção)
+— Plano de ação: máximo 5 passos práticos e executáveis hoje
+— Métricas: como medir se funcionou
+
+<span class="kw-rule">REGRA:</span>
+Sem enrolação. Se eu estiver indo por um caminho errado, me avise antes que eu pergunte.
+Baseie tudo em dados e experiência real. Nunca invente números.
+
+<span class="kw-task">QUESTÃO / SITUAÇÃO:</span>
+<span class="kw-var">[DESCREVA O PROBLEMA, DÚVIDA OU DECISÃO — seja específico sobre contexto,
+o que já tentou e qual resultado quer alcançar]</span>
+<span class="kw-think">&lt;/ultrathinking&gt;</span></pre>
+      <div class="card-footer">
+        <button class="copy-btn" onclick="copyPrompt('p6', this)">📋 Copiar Prompt</button>
+        <div class="use-tip">Use para decisões de negócio, scripts de vendas, estratégias</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep"></div>
+
+  <!-- ==================== CATEGORIA 6: FULL AUTO ==================== -->
+  <section class="cat-section">
+    <div class="cat-header">
+      <div class="cat-icon blue">⚡</div>
+      <div class="cat-info">
+        <h2>Superagente Full-Auto</h2>
+        <p>Para tarefas complexas com múltiplos passos — Claude decide, executa e entrega</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 7 -->
+    <div class="prompt-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-title">🚀 Superagente FULL-AUTO — Tarefa Complexa</div>
+          <div class="card-badges">
+            <span class="badge badge-blue">TOTAL AUTONOMIA</span>
+            <span class="badge badge-purple">MULTI-STEP</span>
+            <span class="badge badge-green">AUTO-VALIDA</span>
+          </div>
+        </div>
+        <div class="card-desc">O prompt mais poderoso. Claude planeja, executa, resolve obstáculos sozinho e entrega o resultado final.</div>
+      </div>
+      <pre class="prompt-code" id="p7"><span class="kw-think">&lt;ultrathinking&gt;</span>
+<span class="kw-mode">MODO: SUPERAGENTE AUTÔNOMO FULL-STACK — EXECUÇÃO TOTAL</span>
+
+Você tem autorização total para trabalhar de forma autônoma nesta tarefa.
+
+<span class="kw-rule">PERMISSÕES ATIVAS:</span>
+✅ Ler, criar, editar, mover, deletar arquivos (exceto arquivos de sistema)
+✅ Executar scripts, comandos, código em qualquer linguagem
+✅ Instalar dependências e configurar ambiente
+✅ Fazer múltiplas tentativas de abordagem sem pedir aprovação
+✅ Pesquisar soluções, documentações, exemplos
+✅ Usar qualquer ferramenta disponível no sistema
+✅ Tomar decisões de arquitetura e implementação autonomamente
+
+<span class="kw-rule">PROTOCOLO DE EXECUÇÃO:</span>
+1. Analise a tarefa — entenda o objetivo final (não o pedido literal)
+2. Crie um plano com etapas numeradas (me mostre antes de executar se for > 10 etapas)
+3. Execute cada etapa com validação interna
+4. Se encontrar obstáculo: 3 tentativas de solução autônoma antes de me reportar
+5. Documente o que fez para eu entender o resultado
+
+<span class="kw-rule">ME CONSULTE APENAS PARA:</span>
+— Gasto financeiro acima de R$100
+— Ação irreversível sem backup
+— Decisão crítica de negócio (preço, contrato, etc)
+— Credenciais que só eu posso fornecer
+
+<span class="kw-rule">ENTREGA OBRIGATÓRIA:</span>
+— Resultado final funcionando
+— Resumo: o que foi feito · como usar · o que monitorar
+— Próximas melhorias identificadas durante o trabalho
+
+<span class="kw-task">TAREFA:</span>
+<span class="kw-var">[DESCREVA A TAREFA COMPLETA — contexto, objetivo, restrições,
+como você vai saber que está pronto]</span>
+
+<span class="kw-task">AMBIENTE:</span>
+<span class="kw-var">[Windows 10/11 OU Linux OU servidor]</span>
+
+<span class="kw-task">ARQUIVOS/SISTEMAS ENVOLVIDOS:</span>
+<span class="kw-var">[Caminhos de pastas, URLs, sistemas que vão ser tocados]</span>
+<span class="kw-think">&lt;/ultrathinking&gt;</span></pre>
+      <div class="card-footer">
+        <button class="copy-btn" onclick="copyPrompt('p7', this)">📋 Copiar Prompt</button>
+        <div class="use-tip">Para quando tem muita coisa pra fazer de uma vez</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep"></div>
+
+  <!-- DEPLOY RÁPIDO - INSTRUÇÃO -->
+  <div class="how-box" style="border-color:rgba(0,255,135,0.2);background:rgba(0,255,135,0.04);">
+    <h2 style="color:var(--verde)">🌐 Deploy da Landing Page — 30 segundos</h2>
+    <div class="how-steps">
+      <div class="how-step" style="border-color:rgba(0,255,135,0.15);">
+        <div class="how-step-num">1</div>
+        <strong>Abra no navegador</strong>
+        <p>Acesse <strong style="color:var(--verde)">netlify.com/drop</strong> no Chrome</p>
+      </div>
+      <div class="how-step" style="border-color:rgba(0,255,135,0.15);">
+        <div class="how-step-num">2</div>
+        <strong>Arraste o arquivo</strong>
+        <p>Arraste <strong style="color:var(--verde)">otimize-systems.zip</strong> da sua pasta para a área de drop da página</p>
+      </div>
+      <div class="how-step" style="border-color:rgba(0,255,135,0.15);">
+        <div class="how-step-num">3</div>
+        <strong>Copie a URL</strong>
+        <p>Em 10 segundos você recebe uma URL pública tipo <strong style="color:var(--verde)">xxxxx.netlify.app</strong></p>
+      </div>
+      <div class="how-step" style="border-color:rgba(0,255,135,0.15);">
+        <div class="how-step-num">4</div>
+        <strong>Domínio próprio (opcional)</strong>
+        <p>Crie conta grátis no Netlify e conecte <strong style="color:var(--verde)">otimize.systems</strong> em 5 minutos</p>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text-muted);margin-top:16px;">
+      Os arquivos <strong style="color:var(--text)">otimize-systems.html</strong> e <strong style="color:var(--text)">otimize-systems.zip</strong> estão na sua pasta selecionada. A landing page tem PT/ES/EN, 2 planos (R$497 e R$597), setup R$1.000, animações, seção FAQ e link direto para WhatsApp.
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  <strong>OTIMIZE Systems</strong> · Prompts Ultrathinking v1.0 · Claude Code
+  <br><span style="font-size:11px;">Estes prompts funcionam com Claude Code (claude.ai/code) e Claude API via terminal</span>
+</footer>
+
+<script>
+function copyPrompt(id, btn) {
+  const pre = document.getElementById(id);
+  // Pega o texto puro sem as tags HTML de highlight
+  let text = pre.innerText || pre.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Fallback: selecionar o texto
+    const range = document.createRange();
+    range.selectNodeContents(pre);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('copy');
+    btn.innerHTML = '✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = '📋 Copiar Prompt'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Scroll reveal suave
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+  });
+}, {threshold:0.05});
+
+document.querySelectorAll('.prompt-card,.cat-section,.how-box').forEach(el => {
+  el.style.cssText += 'opacity:0;transform:translateY(20px);transition:opacity 0.5s ease,transform 0.5s ease;';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
