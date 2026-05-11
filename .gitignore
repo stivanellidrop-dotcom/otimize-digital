@@ -30,5 +30,12 @@ node_modules/
 dist/
 build/
 
+# Remotion
+.remotion/
+videos/*/node_modules/
+videos/*/.cache/
+videos/*/out/
+*.tsbuildinfo
+
 # Claude / hooks locais
 .claude/local.settings.json

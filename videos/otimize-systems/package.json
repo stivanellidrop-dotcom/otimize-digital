@@ -1,0 +1,23 @@
+{
+  "name": "otimize-systems-videos",
+  "version": "1.0.0",
+  "description": "Videos demo OTIMIZE Systems via Remotion",
+  "scripts": {
+    "start": "remotion studio",
+    "render": "remotion render",
+    "render:all": "remotion render VideoA --output=out/VideoA.mp4 && remotion render VideoB --output=out/VideoB.mp4 && remotion render VideoC --output=out/VideoC.mp4",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.319",
+    "@remotion/google-fonts": "4.0.319",
+    "remotion": "4.0.319",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.0",
+    "@types/node": "20.0.0",
+    "typescript": "5.6.3"
+  }
+}
