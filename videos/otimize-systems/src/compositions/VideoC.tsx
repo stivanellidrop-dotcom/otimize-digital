@@ -1,7 +1,10 @@
 import React from "react";
 import {
   AbsoluteFill,
+  Audio,
+  Img,
   Sequence,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
   interpolate,
@@ -10,19 +13,28 @@ import {
 } from "remotion";
 import { THEME } from "../theme";
 import { spaceGroteskFamily, interFamily } from "../fonts";
-import { Background, OtimizeLogo } from "../components/Background";
-import { PriceBadge } from "../components/PriceBadge";
+import { Background } from "../components/Background";
 import {
   WhatsAppMockup,
   WhatsAppMessage,
 } from "../components/WhatsAppMockup";
 
 // =============================================================
-// VideoC - "Behind the scenes / Revelação" - 40s @ 30fps
+// VideoC - V2 Igor - "Behind the scenes / Revelação" - 40s @ 30fps
+// 1200 frames totais
 // Estratégia: surpresa positiva. Lead acabou de conversar com agente
 // IA no Empório Stivanelli e agora descobre que era IA o tempo todo.
 // Funciona em 1080x1920 (vertical) e 1080x1080 (square).
 // =============================================================
+
+// Flags de áudio: deixar música opcional caso o asset não esteja presente.
+const MUSIC_ENABLED = true;
+const VOICEOVER_ENABLED = true;
+
+// Asset do produto real (path relativo ao public/).
+// O componente WhatsAppMockup usa esta string como CSS `background`,
+// então passamos url() apontando para o staticFile.
+const PRODUCT_IMAGE_BG = `url("${staticFile("products/vestido-floral.jpg")}")`;
 
 // ---- Cena 1: Recap WhatsApp Empório Stivanelli (0-210 = 0-7s) ----
 const SceneRecapWhatsApp: React.FC = () => {
@@ -31,6 +43,8 @@ const SceneRecapWhatsApp: React.FC = () => {
   const isSquare = height <= 1080;
 
   // Mensagens com timing escalonado (frame absoluto dentro da Sequence)
+  // A 3a mensagem agora usa foto REAL do produto (vestido-floral) ao invés
+  // do gradient rosa de antes.
   const messages: WhatsAppMessage[] = [
     {
       from: 18,
@@ -45,7 +59,7 @@ const SceneRecapWhatsApp: React.FC = () => {
     {
       from: 84,
       side: "in",
-      imageUrl: "linear-gradient(135deg, #ff6b9d, #c44569)",
+      imageUrl: PRODUCT_IMAGE_BG,
       text: "Esse aqui é nosso campeão! R$ 89,90 ou 3x sem juros",
     },
     {
@@ -147,9 +161,11 @@ const SceneRecapWhatsApp: React.FC = () => {
 };
 
 // ---- Cena 2: Revelação - "Foi feito 100% por agente IA" (210-360 = 7-12s) ----
+// V2: Logo OTIMIZE entra abaixo do texto reveal, com spring + glow.
 const SceneReveal: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, height } = useVideoConfig();
+  const isSquare = height <= 1080;
 
   // Glow pulsante no fundo durante a revelação
   const glowPulse = 0.5 + Math.sin(frame / 8) * 0.25;
@@ -179,6 +195,18 @@ const SceneReveal: React.FC = () => {
   // Highlight "100% por agente IA" pulsa
   const highlightPulse = 1 + Math.sin(Math.max(0, frame - 30) / 6) * 0.04;
 
+  // Logo OTIMIZE entra depois da linha 2 (frame 70)
+  const logoSpring = spring({
+    frame: Math.max(0, frame - 70),
+    fps,
+    config: { damping: 12, stiffness: 150, mass: 1 },
+  });
+  const logoOpacity = interpolate(logoSpring, [0, 1], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+  const logoScale = interpolate(logoSpring, [0, 1], [0.4, 1]);
+  const logoFloat = Math.sin(Math.max(0, frame - 70) / 12) * 4;
+
   // Fade out final
   const sceneOpacity = interpolate(
     frame,
@@ -186,6 +214,8 @@ const SceneReveal: React.FC = () => {
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
+
+  const logoSize = isSquare ? 180 : 220;
 
   return (
     <AbsoluteFill
@@ -210,7 +240,7 @@ const SceneReveal: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 40,
+          gap: isSquare ? 28 : 40,
           padding: "0 60px",
           textAlign: "center",
         }}
@@ -218,7 +248,7 @@ const SceneReveal: React.FC = () => {
         <div
           style={{
             fontFamily: spaceGroteskFamily,
-            fontSize: 78,
+            fontSize: isSquare ? 64 : 78,
             fontWeight: 800,
             color: THEME.text,
             letterSpacing: "-0.02em",
@@ -233,7 +263,7 @@ const SceneReveal: React.FC = () => {
         <div
           style={{
             fontFamily: spaceGroteskFamily,
-            fontSize: 92,
+            fontSize: isSquare ? 76 : 92,
             fontWeight: 900,
             color: THEME.text,
             letterSpacing: "-0.03em",
@@ -251,6 +281,21 @@ const SceneReveal: React.FC = () => {
           >
             100% por agente IA
           </span>
+        </div>
+
+        {/* Logo OTIMIZE - aparece abaixo do reveal */}
+        <div
+          style={{
+            opacity: logoOpacity,
+            transform: `scale(${logoScale}) translateY(${logoFloat}px)`,
+            filter: `drop-shadow(0 0 40px ${THEME.verde}) drop-shadow(0 0 20px ${THEME.verdeGlow})`,
+            marginTop: isSquare ? 10 : 20,
+          }}
+        >
+          <Img
+            src={staticFile("otimize-logo.svg")}
+            style={{ width: logoSize, height: logoSize, display: "block" }}
+          />
         </div>
       </div>
     </AbsoluteFill>
@@ -592,6 +637,7 @@ const SceneMath: React.FC = () => {
 };
 
 // ---- Cena 5: Pitch CTA - "Imagina isso na SUA loja" (900-1080 = 30-36s) ----
+// V2: logo OTIMIZE grande centralizado (substitui o OtimizeLogo placeholder)
 const ScenePitch: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, height } = useVideoConfig();
@@ -612,7 +658,7 @@ const ScenePitch: React.FC = () => {
   const suaPulse = 1 + Math.sin(frame / 7) * 0.08;
   const suaGlow = 0.6 + Math.sin(frame / 6) * 0.4;
 
-  // Logo entra depois (frame 50)
+  // Logo entra depois (frame 50) - grande centralizado com glow
   const logoSpring = spring({
     frame: Math.max(0, frame - 50),
     fps,
@@ -621,7 +667,8 @@ const ScenePitch: React.FC = () => {
   const logoOpacity = interpolate(logoSpring, [0, 1], [0, 1], {
     extrapolateRight: "clamp",
   });
-  const logoScale = interpolate(logoSpring, [0, 1], [0.7, 1]);
+  const logoScale = interpolate(logoSpring, [0, 1], [0.5, 1]);
+  const logoGlowPulse = 0.7 + Math.sin(frame / 9) * 0.3;
 
   // Fade out
   const sceneOpacity = interpolate(
@@ -630,6 +677,8 @@ const ScenePitch: React.FC = () => {
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
+
+  const logoSize = isSquare ? 360 : 440;
 
   return (
     <AbsoluteFill
@@ -640,12 +689,23 @@ const ScenePitch: React.FC = () => {
         padding: "0 60px",
       }}
     >
+      {/* Glow grande de fundo no logo */}
+      <AbsoluteFill
+        style={{
+          background: `radial-gradient(circle at 50% 60%, rgba(0,255,135,${
+            logoGlowPulse * 0.35
+          }) 0%, transparent 55%)`,
+          opacity: logoOpacity,
+          pointerEvents: "none",
+        }}
+      />
+
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: isSquare ? 70 : 120,
+          gap: isSquare ? 60 : 100,
           textAlign: "center",
         }}
       >
@@ -682,35 +742,74 @@ const ScenePitch: React.FC = () => {
           style={{
             opacity: logoOpacity,
             transform: `scale(${logoScale})`,
+            filter: `drop-shadow(0 0 60px ${THEME.verde}) drop-shadow(0 0 30px ${THEME.verdeGlow})`,
           }}
         >
-          <OtimizeLogo size={isSquare ? 110 : 140} />
+          <Img
+            src={staticFile("otimize-logo.svg")}
+            style={{ width: logoSize, height: logoSize, display: "block" }}
+          />
         </div>
       </div>
     </AbsoluteFill>
   );
 };
 
-// ---- Cena 6: Final Card - PriceBadge + CTA + Contato (1080-1200 = 36-40s) ----
+// ---- Cena 6: Final Card - Logo + Ancoragem R$997 -> R$597 + CTA + Contato (1080-1200 = 36-40s) ----
 const SceneFinalCard: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, height } = useVideoConfig();
   const isSquare = height <= 1080;
 
-  // CTA "Bora agendar demo?"
-  const ctaSpring = spring({
-    frame: Math.max(0, frame - 25),
+  // Logo entra primeiro
+  const logoSpring = spring({
+    frame,
     fps,
-    config: { damping: 14, stiffness: 160 },
+    config: { damping: 14, stiffness: 150 },
   });
-  const ctaOpacity = interpolate(ctaSpring, [0, 1], [0, 1], {
+  const logoOpacity = interpolate(logoSpring, [0, 1], [0, 1], {
     extrapolateRight: "clamp",
   });
-  const ctaTranslate = interpolate(ctaSpring, [0, 1], [20, 0]);
+  const logoTranslate = interpolate(logoSpring, [0, 1], [-20, 0]);
+
+  // Badge PROMOÇÃO pulsante - entra logo após o logo
+  const promoSpring = spring({
+    frame: Math.max(0, frame - 12),
+    fps,
+    config: { damping: 12, stiffness: 160 },
+  });
+  const promoOpacity = interpolate(promoSpring, [0, 1], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+  const promoEntryScale = interpolate(promoSpring, [0, 1], [0.7, 1]);
+  const promoPulse = 1 + Math.sin(frame / 6) * 0.06;
+  const promoGlow = 0.6 + Math.sin(frame / 7) * 0.4;
+
+  // Preço antigo (R$ 997) com risco animado
+  const oldPriceOpacity = interpolate(frame, [20, 35], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const strikeProgress = interpolate(frame, [30, 50], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // Preço novo (R$ 597) com bounce
+  const newPriceSpring = spring({
+    frame: Math.max(0, frame - 48),
+    fps,
+    config: { damping: 10, stiffness: 180 },
+  });
+  const newPriceOpacity = interpolate(newPriceSpring, [0, 1], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+  const newPriceScale = interpolate(newPriceSpring, [0, 1], [0.5, 1]);
+  const newPricePulse = 1 + Math.sin(frame / 8) * 0.02;
 
   // Contato (WhatsApp + URL)
   const contactSpring = spring({
-    frame: Math.max(0, frame - 45),
+    frame: Math.max(0, frame - 75),
     fps,
     config: { damping: 14, stiffness: 160 },
   });
@@ -719,15 +818,14 @@ const SceneFinalCard: React.FC = () => {
   });
   const contactTranslate = interpolate(contactSpring, [0, 1], [20, 0]);
 
-  // Pulse na call-to-action
-  const ctaPulse = 1 + Math.sin(frame / 8) * 0.03;
+  const logoSize = isSquare ? 140 : 170;
 
   return (
     <AbsoluteFill
       style={{
         justifyContent: "center",
         alignItems: "center",
-        padding: "0 60px",
+        padding: isSquare ? "40px 50px" : "40px 60px",
       }}
     >
       <div
@@ -735,32 +833,113 @@ const SceneFinalCard: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: isSquare ? 30 : 50,
+          gap: isSquare ? 18 : 24,
           textAlign: "center",
         }}
       >
-        <PriceBadge
-          price="R$ 597"
-          subtitle="por mês"
-          cta=""
-          scale={isSquare ? 0.55 : 0.7}
-        />
+        {/* Logo real */}
+        <div
+          style={{
+            opacity: logoOpacity,
+            transform: `translateY(${logoTranslate}px)`,
+            filter: `drop-shadow(0 0 30px ${THEME.verdeGlow})`,
+          }}
+        >
+          <Img
+            src={staticFile("otimize-logo.svg")}
+            style={{ width: logoSize, height: logoSize, display: "block" }}
+          />
+        </div>
+
+        {/* Badge PROMOÇÃO pulsante */}
+        <div
+          style={{
+            opacity: promoOpacity,
+            transform: `scale(${promoEntryScale * promoPulse})`,
+            background: `linear-gradient(135deg, ${THEME.red} 0%, #b91c1c 100%)`,
+            color: "#fff",
+            fontFamily: spaceGroteskFamily,
+            fontWeight: 900,
+            fontSize: isSquare ? 26 : 30,
+            padding: isSquare ? "8px 24px" : "10px 28px",
+            borderRadius: 100,
+            letterSpacing: "0.08em",
+            boxShadow: `0 0 ${30 * promoGlow}px rgba(239,68,68,${
+              0.5 + promoGlow * 0.3
+            }), 0 8px 24px rgba(0,0,0,0.4)`,
+            textTransform: "uppercase",
+          }}
+        >
+          Promoção
+        </div>
+
+        {/* Preço antigo riscado */}
+        <div
+          style={{
+            position: "relative",
+            opacity: oldPriceOpacity,
+            fontFamily: spaceGroteskFamily,
+            fontWeight: 700,
+            fontSize: isSquare ? 44 : 54,
+            color: THEME.textMuted,
+            letterSpacing: "-0.02em",
+            padding: "0 8px",
+          }}
+        >
+          <span style={{ opacity: 0.85 }}>De R$ 997</span>
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              height: 6,
+              background: THEME.red,
+              width: `${strikeProgress * 100}%`,
+              transform: "translateY(-50%) rotate(-3deg)",
+              boxShadow: `0 0 12px ${THEME.red}`,
+              borderRadius: 4,
+            }}
+          />
+        </div>
+
+        {/* Preço novo grande verde */}
+        <div
+          style={{
+            opacity: newPriceOpacity,
+            transform: `scale(${newPriceScale * newPricePulse})`,
+            background: `linear-gradient(135deg, ${THEME.verde} 0%, ${THEME.verdeDark} 100%)`,
+            color: "#000",
+            fontFamily: spaceGroteskFamily,
+            fontWeight: 900,
+            fontSize: isSquare ? 100 : 124,
+            padding: isSquare ? "16px 36px" : "20px 44px",
+            borderRadius: 24,
+            letterSpacing: "-0.04em",
+            lineHeight: 1,
+            boxShadow: `0 20px 80px ${THEME.verdeGlow}, 0 0 0 4px rgba(0,255,135,0.25)`,
+          }}
+        >
+          Por R$ 597
+        </div>
 
         <div
           style={{
-            opacity: ctaOpacity,
-            transform: `translateY(${ctaTranslate}px) scale(${ctaPulse})`,
-            fontFamily: spaceGroteskFamily,
-            fontSize: isSquare ? 54 : 68,
-            fontWeight: 900,
-            color: THEME.verde,
-            letterSpacing: "-0.02em",
-            textShadow: `0 0 30px ${THEME.verdeGlow}`,
+            opacity: newPriceOpacity,
+            fontFamily: interFamily,
+            fontSize: isSquare ? 24 : 28,
+            color: THEME.text,
+            fontWeight: 600,
+            marginTop: -4,
+            maxWidth: isSquare ? 600 : 720,
           }}
         >
-          Bora agendar demo?
+          por mês,{" "}
+          <span style={{ color: THEME.verde, fontWeight: 700 }}>
+            enquanto tiver vagas
+          </span>
         </div>
 
+        {/* Contato (WhatsApp + URL) */}
         <div
           style={{
             opacity: contactOpacity,
@@ -768,22 +947,22 @@ const SceneFinalCard: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: isSquare ? 14 : 22,
-            marginTop: isSquare ? 10 : 20,
+            gap: isSquare ? 10 : 14,
+            marginTop: isSquare ? 10 : 14,
           }}
         >
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 18,
+              gap: 16,
               background: "rgba(13, 18, 32, 0.85)",
               border: `2px solid ${THEME.verde}`,
               borderRadius: 18,
-              padding: isSquare ? "16px 28px" : "22px 36px",
+              padding: isSquare ? "12px 22px" : "16px 28px",
               boxShadow: `0 8px 30px ${THEME.verdeGlow}`,
               fontFamily: interFamily,
-              fontSize: isSquare ? 36 : 46,
+              fontSize: isSquare ? 28 : 34,
               fontWeight: 700,
               color: THEME.text,
               letterSpacing: "-0.01em",
@@ -795,10 +974,11 @@ const SceneFinalCard: React.FC = () => {
           <div
             style={{
               fontFamily: spaceGroteskFamily,
-              fontSize: isSquare ? 40 : 50,
+              fontSize: isSquare ? 30 : 38,
               fontWeight: 800,
               color: THEME.text,
               letterSpacing: "-0.02em",
+              textShadow: `0 0 16px ${THEME.verdeGlow}`,
             }}
           >
             otimize.digital
@@ -810,19 +990,32 @@ const SceneFinalCard: React.FC = () => {
 };
 
 // =============================================================
-// Composição principal
+// Composição principal - 1200 frames @ 30fps = 40s
 // =============================================================
 export const VideoC: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: THEME.bg }}>
       <Background variant="dark" />
 
-      {/* Cena 1: Recap WhatsApp (0-7s) */}
+      {/* Trilha sonora cinematográfica (volume baixo) - opcional via flag */}
+      {MUSIC_ENABLED && (
+        <Audio src={staticFile("music/cinematic-tech.mp3")} volume={0.25} />
+      )}
+
+      {/* Narração principal */}
+      {VOICEOVER_ENABLED && (
+        <Audio
+          src={staticFile("voiceover/videoC-narration.mp3")}
+          volume={1.0}
+        />
+      )}
+
+      {/* Cena 1: Recap WhatsApp (0-7s) - agora com foto real do vestido */}
       <Sequence from={0} durationInFrames={210}>
         <SceneRecapWhatsApp />
       </Sequence>
 
-      {/* Cena 2: Revelação IA (7-12s) */}
+      {/* Cena 2: Revelação IA (7-12s) - agora com logo OTIMIZE abaixo do reveal */}
       <Sequence from={210} durationInFrames={150}>
         <SceneReveal />
       </Sequence>
@@ -837,12 +1030,12 @@ export const VideoC: React.FC = () => {
         <SceneMath />
       </Sequence>
 
-      {/* Cena 5: Pitch CTA (30-36s) */}
+      {/* Cena 5: Pitch CTA (30-36s) - logo grande centralizado */}
       <Sequence from={900} durationInFrames={180}>
         <ScenePitch />
       </Sequence>
 
-      {/* Cena 6: Final card (36-40s) */}
+      {/* Cena 6: Final card (36-40s) - logo + ancoragem R$997 -> R$597 */}
       <Sequence from={1080} durationInFrames={120}>
         <SceneFinalCard />
       </Sequence>

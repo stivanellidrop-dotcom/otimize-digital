@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <style>
+      .brain-solid { fill: #00E676; }
+      .brain-circuit { fill: none; stroke: #00E676; stroke-width: 8; stroke-linecap: round; }
+      .brain-node { fill: #00E676; }
+      .title { fill: #FFFFFF; font-family: 'Inter', 'Arial Black', sans-serif; font-weight: 900; letter-spacing: -2px; }
+      .systems { fill: #00E676; font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: 1px; }
+      .tagline { fill: #FFFFFF; font-family: 'Dancing Script', cursive; font-weight: 600; font-style: italic; }
+    </style>
+  </defs>
+
+  <rect width="1024" height="1024" fill="#0A0A0A"/>
+
+  <g transform="translate(512 280)">
+    <path class="brain-solid" d="M -150 -120 C -200 -90 -220 -30 -200 30 C -210 70 -190 110 -150 120 C -120 140 -80 130 -50 110 L -10 110 L -10 -120 L -50 -130 C -90 -140 -120 -135 -150 -120 Z"/>
+
+    <g class="brain-circuit">
+      <path d="M 10 -120 C 60 -130 100 -130 140 -115 C 180 -100 210 -70 215 -30 C 225 10 215 50 195 80 C 175 115 130 130 90 130 C 50 130 25 120 10 110 Z"/>
+      <line x1="30" y1="-80" x2="80" y2="-90"/>
+      <line x1="80" y1="-90" x2="130" y2="-70"/>
+      <line x1="130" y1="-70" x2="170" y2="-30"/>
+      <line x1="50" y1="-30" x2="100" y2="-10"/>
+      <line x1="100" y1="-10" x2="150" y2="-20"/>
+      <line x1="60" y1="40" x2="120" y2="50"/>
+      <line x1="120" y1="50" x2="170" y2="30"/>
+      <line x1="40" y1="80" x2="90" y2="90"/>
+      <line x1="90" y1="90" x2="140" y2="80"/>
+      <line x1="30" y1="-80" x2="20" y2="-40"/>
+      <line x1="20" y1="-40" x2="50" y2="-30"/>
+      <line x1="100" y1="-10" x2="120" y2="30"/>
+    </g>
+
+    <g class="brain-node">
+      <circle cx="30" cy="-80" r="7"/>
+      <circle cx="80" cy="-90" r="7"/>
+      <circle cx="130" cy="-70" r="7"/>
+      <circle cx="170" cy="-30" r="7"/>
+      <circle cx="50" cy="-30" r="7"/>
+      <circle cx="100" cy="-10" r="7"/>
+      <circle cx="150" cy="-20" r="7"/>
+      <circle cx="60" cy="40" r="7"/>
+      <circle cx="120" cy="50" r="7"/>
+      <circle cx="170" cy="30" r="7"/>
+      <circle cx="40" cy="80" r="7"/>
+      <circle cx="90" cy="90" r="7"/>
+      <circle cx="140" cy="80" r="7"/>
+      <circle cx="20" cy="-40" r="7"/>
+    </g>
+  </g>
+
+  <text class="title" x="512" y="650" font-size="180" text-anchor="middle">OTIMIZE</text>
+
+  <text class="systems" x="512" y="760" font-size="90" text-anchor="middle">systems</text>
+
+  <text class="tagline" x="512" y="900" font-size="80" text-anchor="middle">Catálogos Inteligentes</text>
+</svg>

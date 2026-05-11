@@ -1,28 +1,35 @@
 import React from "react";
 import {
   AbsoluteFill,
+  Audio,
+  Img,
   Sequence,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
   interpolate,
   spring,
   Easing,
 } from "remotion";
-import { Background, OtimizeLogo } from "../components/Background";
-import { PriceBadge } from "../components/PriceBadge";
+import { Background } from "../components/Background";
 import { THEME } from "../theme";
 import { interFamily, spaceGroteskFamily } from "../fonts";
 
 /* =========================================================================
-   VideoB — "Dados / Impacto financeiro"
+   VideoB — "Dados / Impacto financeiro" - V2 Igor
    45s @ 30fps = 1350 frames
    - 0-90     : Stat 70%
    - 90-450   : 3 dores (4s cada = 120 frames)
-   - 450-540  : Transicao "A solucao"
+   - 450-540  : Transicao "A solucao" (com logo real grande + glow)
    - 540-900  : 3 features (4s cada = 120 frames)
    - 900-1170 : Comparativo lado a lado
-   - 1170-1350: CTA final (preco + logo + contato)
+   - 1170-1350: CTA final (logo real + preco ancorado R$997 -> R$597 + contato)
    ========================================================================= */
+
+// Flags de áudio: deixar música opcional caso o asset não esteja presente.
+// O voiceover já existe em public/voiceover/, então rendemos por padrão.
+const MUSIC_ENABLED = true;
+const VOICEOVER_ENABLED = true;
 
 /* ---------------------------- Bloco 1: Stat 70% --------------------------- */
 
@@ -292,7 +299,7 @@ const PainCard: React.FC<{
   );
 };
 
-/* ---------------------------- Bloco 3: Transicao "A Solucao" ------------- */
+/* ---------------------------- Bloco 3: Transicao "A Solucao" (com logo real) ------------- */
 
 const TransitionBlock: React.FC = () => {
   const frame = useCurrentFrame();
@@ -315,10 +322,13 @@ const TransitionBlock: React.FC = () => {
     fps,
     config: { damping: 12, stiffness: 140 },
   });
-  const logoScale = interpolate(logoSpring, [0, 1], [0.6, 1]);
+  const logoScale = interpolate(logoSpring, [0, 1], [0.4, 1]);
   const logoOpacity = interpolate(logoSpring, [0, 1], [0, 1], {
     extrapolateRight: "clamp",
   });
+
+  // Pulse no glow do logo
+  const glowPulse = 0.7 + Math.sin(frame / 8) * 0.3;
 
   const captionOpacity = interpolate(frame, [55, 75], [0, 1], {
     extrapolateLeft: "clamp",
@@ -328,6 +338,8 @@ const TransitionBlock: React.FC = () => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+
+  const logoSize = isVertical ? 480 : 400;
 
   return (
     <AbsoluteFill
@@ -351,6 +363,17 @@ const TransitionBlock: React.FC = () => {
         }}
       />
 
+      {/* Glow grande atrás do logo */}
+      <AbsoluteFill
+        style={{
+          background: `radial-gradient(circle at 50% 45%, rgba(0,255,135,${
+            glowPulse * 0.45
+          }) 0%, transparent 55%)`,
+          opacity: logoOpacity,
+          pointerEvents: "none",
+        }}
+      />
+
       <div
         style={{
           display: "flex",
@@ -363,12 +386,15 @@ const TransitionBlock: React.FC = () => {
       >
         <div
           style={{
-            transform: `scale(${logoScale * 2.4})`,
+            transform: `scale(${logoScale})`,
             opacity: logoOpacity,
-            filter: `drop-shadow(0 0 60px ${THEME.verdeGlow})`,
+            filter: `drop-shadow(0 0 80px ${THEME.verde}) drop-shadow(0 0 40px ${THEME.verdeGlow})`,
           }}
         >
-          <OtimizeLogo size={isVertical ? 120 : 100} />
+          <Img
+            src={staticFile("otimize-logo.svg")}
+            style={{ width: logoSize, height: logoSize, display: "block" }}
+          />
         </div>
 
         <div
@@ -810,7 +836,7 @@ const CompareBlock: React.FC = () => {
   );
 };
 
-/* ---------------------------- Bloco 6: CTA Final -------------------------- */
+/* ---------------------------- Bloco 6: CTA Final (logo real + ancoragem) -------------------------- */
 
 const FinalCTABlock: React.FC = () => {
   const frame = useCurrentFrame();
@@ -827,21 +853,58 @@ const FinalCTABlock: React.FC = () => {
   });
   const logoTranslateY = interpolate(logoSpring, [0, 1], [-30, 0]);
 
-  const contactOpacity = interpolate(frame, [80, 100], [0, 1], {
+  // Pricing badge entra logo após o logo
+  const priceSpring = spring({
+    frame: Math.max(0, frame - 18),
+    fps,
+    config: { damping: 12, stiffness: 160 },
+  });
+  const priceOpacity = interpolate(priceSpring, [0, 1], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+  const priceScale = interpolate(priceSpring, [0, 1], [0.7, 1]);
+
+  // Promoção badge pulsa
+  const promoPulse = 1 + Math.sin(frame / 6) * 0.06;
+  const promoGlow = 0.6 + Math.sin(frame / 7) * 0.4;
+
+  // Risco animado no preço antigo (linha riscando entra)
+  const strikeProgress = interpolate(frame, [30, 50], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const contactTranslateY = interpolate(frame, [80, 100], [20, 0], {
+
+  // Preço novo entra com bounce após a risca
+  const newPriceSpring = spring({
+    frame: Math.max(0, frame - 50),
+    fps,
+    config: { damping: 10, stiffness: 180 },
+  });
+  const newPriceOpacity = interpolate(newPriceSpring, [0, 1], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+  const newPriceScale = interpolate(newPriceSpring, [0, 1], [0.5, 1]);
+
+  // Pulse sutil no preço novo
+  const newPricePulse = 1 + Math.sin(frame / 8) * 0.02;
+
+  const contactOpacity = interpolate(frame, [110, 135], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  const contactTranslateY = interpolate(frame, [110, 135], [20, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const logoSize = isVertical ? 260 : 220;
 
   return (
     <AbsoluteFill
       style={{
         justifyContent: "center",
         alignItems: "center",
-        padding: isVertical ? 80 : 60,
+        padding: isVertical ? 60 : 50,
       }}
     >
       <div
@@ -849,25 +912,124 @@ const FinalCTABlock: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: isVertical ? 44 : 32,
+          gap: isVertical ? 28 : 22,
         }}
       >
+        {/* Logo real */}
         <div
           style={{
             opacity: logoOpacity,
-            transform: `translateY(${logoTranslateY}px) scale(${isVertical ? 1.4 : 1.2})`,
+            transform: `translateY(${logoTranslateY}px)`,
+            filter: `drop-shadow(0 0 30px ${THEME.verdeGlow})`,
           }}
         >
-          <OtimizeLogo size={isVertical ? 80 : 70} />
+          <Img
+            src={staticFile("otimize-logo.svg")}
+            style={{ width: logoSize, height: logoSize, display: "block" }}
+          />
         </div>
 
-        <PriceBadge
-          price="R$ 597/mês"
-          subtitle="OTIMIZE Systems"
-          cta="Menos que diária de funcionário"
-          scale={isVertical ? 0.9 : 0.8}
-        />
+        {/* Badge PROMOÇÃO pulsante */}
+        <div
+          style={{
+            opacity: priceOpacity,
+            transform: `scale(${priceScale * promoPulse})`,
+            background: `linear-gradient(135deg, ${THEME.red} 0%, #b91c1c 100%)`,
+            color: "#fff",
+            fontFamily: spaceGroteskFamily,
+            fontWeight: 900,
+            fontSize: isVertical ? 30 : 26,
+            padding: isVertical ? "10px 28px" : "8px 24px",
+            borderRadius: 100,
+            letterSpacing: "0.08em",
+            boxShadow: `0 0 ${30 * promoGlow}px rgba(239,68,68,${
+              0.5 + promoGlow * 0.3
+            }), 0 8px 24px rgba(0,0,0,0.4)`,
+            textTransform: "uppercase",
+          }}
+        >
+          Promoção
+        </div>
 
+        {/* Bloco de preço com ancoragem */}
+        <div
+          style={{
+            opacity: priceOpacity,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: isVertical ? 14 : 12,
+          }}
+        >
+          {/* Preço antigo riscado */}
+          <div
+            style={{
+              position: "relative",
+              fontFamily: spaceGroteskFamily,
+              fontWeight: 700,
+              fontSize: isVertical ? 56 : 46,
+              color: THEME.textMuted,
+              letterSpacing: "-0.02em",
+              padding: "0 8px",
+            }}
+          >
+            <span style={{ opacity: 0.85 }}>De R$ 997</span>
+            {/* Linha riscando animada */}
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                height: 6,
+                background: THEME.red,
+                width: `${strikeProgress * 100}%`,
+                transform: "translateY(-50%) rotate(-3deg)",
+                boxShadow: `0 0 12px ${THEME.red}`,
+                borderRadius: 4,
+              }}
+            />
+          </div>
+
+          {/* Preço novo grande verde */}
+          <div
+            style={{
+              opacity: newPriceOpacity,
+              transform: `scale(${newPriceScale * newPricePulse})`,
+              background: `linear-gradient(135deg, ${THEME.verde} 0%, ${THEME.verdeDark} 100%)`,
+              color: "#000",
+              fontFamily: spaceGroteskFamily,
+              fontWeight: 900,
+              fontSize: isVertical ? 130 : 110,
+              padding: isVertical ? "20px 44px" : "16px 40px",
+              borderRadius: 24,
+              letterSpacing: "-0.04em",
+              lineHeight: 1,
+              boxShadow: `0 20px 80px ${THEME.verdeGlow}, 0 0 0 4px rgba(0,255,135,0.25)`,
+            }}
+          >
+            Por R$ 597
+          </div>
+
+          <div
+            style={{
+              opacity: newPriceOpacity,
+              fontFamily: interFamily,
+              fontSize: isVertical ? 28 : 24,
+              color: THEME.text,
+              fontWeight: 600,
+              marginTop: 4,
+              textAlign: "center",
+              maxWidth: isVertical ? 720 : 640,
+            }}
+          >
+            por mês,{" "}
+            <span style={{ color: THEME.verde, fontWeight: 700 }}>
+              enquanto tiver vagas
+            </span>
+          </div>
+        </div>
+
+        {/* Contato */}
         <div
           style={{
             opacity: contactOpacity,
@@ -875,14 +1037,14 @@ const FinalCTABlock: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 10,
-            marginTop: isVertical ? 16 : 8,
+            gap: 8,
+            marginTop: isVertical ? 12 : 6,
           }}
         >
           <div
             style={{
               fontFamily: interFamily,
-              fontSize: isVertical ? 30 : 24,
+              fontSize: isVertical ? 28 : 22,
               color: THEME.text,
               fontWeight: 600,
               letterSpacing: "0.01em",
@@ -893,7 +1055,7 @@ const FinalCTABlock: React.FC = () => {
           <div
             style={{
               fontFamily: spaceGroteskFamily,
-              fontSize: isVertical ? 32 : 26,
+              fontSize: isVertical ? 30 : 24,
               color: THEME.verde,
               fontWeight: 700,
               letterSpacing: "-0.01em",
@@ -914,6 +1076,19 @@ export const VideoB: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: THEME.bg }}>
       <Background variant="dark" />
+
+      {/* Trilha sonora cinematográfica (volume baixo) - opcional via flag */}
+      {MUSIC_ENABLED && (
+        <Audio src={staticFile("music/cinematic-tech.mp3")} volume={0.25} />
+      )}
+
+      {/* Narração principal */}
+      {VOICEOVER_ENABLED && (
+        <Audio
+          src={staticFile("voiceover/videoB-narration.mp3")}
+          volume={1.0}
+        />
+      )}
 
       {/* 0-90 — Stat 70% */}
       <Sequence from={0} durationInFrames={90}>
@@ -946,7 +1121,7 @@ export const VideoB: React.FC = () => {
         />
       </Sequence>
 
-      {/* 450-540 — Transição "A solução" */}
+      {/* 450-540 — Transição "A solução" (logo real grande + glow) */}
       <Sequence from={450} durationInFrames={90}>
         <TransitionBlock />
       </Sequence>
@@ -982,7 +1157,7 @@ export const VideoB: React.FC = () => {
         <CompareBlock />
       </Sequence>
 
-      {/* 1170-1350 — CTA Final */}
+      {/* 1170-1350 — CTA Final com logo real + ancoragem R$997 -> R$597 */}
       <Sequence from={1170} durationInFrames={180}>
         <FinalCTABlock />
       </Sequence>
