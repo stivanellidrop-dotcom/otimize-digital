@@ -15,7 +15,7 @@ import { THEME } from "../theme";
 import { interFamily, spaceGroteskFamily } from "../fonts";
 
 // =========================================================
-// TESTE GRATIS BADGE — inline
+// CTA BADGE — inline
 // =========================================================
 const TesteGratisBadge: React.FC<{ scale?: number }> = ({ scale = 1 }) => {
   const frame = useCurrentFrame();
@@ -50,10 +50,7 @@ const TesteGratisBadge: React.FC<{ scale?: number }> = ({ scale = 1 }) => {
           textAlign: "center",
         }}
       >
-        TESTE
-        <br />
-        GRATIS
-        <br />7 DIAS
+        TESTE AGORA
       </div>
       <div
         style={{
@@ -63,7 +60,7 @@ const TesteGratisBadge: React.FC<{ scale?: number }> = ({ scale = 1 }) => {
           fontWeight: 500,
         }}
       >
-        Sem cartao. Sem compromisso.
+        (11) 97820-2286
       </div>
     </div>
   );
