@@ -167,6 +167,44 @@ Plano: 30 testes (10 Empório + 10 OTIMIZE + 10 edge). **Executado: 2 testes (Em
 - `#crm` → reinicia novo atendimento via chatbot
 - Se conversa travar: ir Atendimentos admin → conversa → Concluir → voltar WhatsApp + `#crm`
 
+### 3.11 ✅ FIX VALIDADO — Teste 3 OTIMIZE
+
+Após aplicar fix na habilidade "Etiquetas do contato" de Ygor-OTIMIZE-Systems:
+- Desmarcado checkbox "Executar sem responder ao cliente"
+- Reescrito Definição de uso específica: filtrar etiquetas por contexto (anúncio→OT_LEAD_TRAFEGO, preço→OT_QUER_SISTEMA, demo→OT_DEMO_MARCADA, contratação→OT_CLIENTE_OTIMIZE)
+
+**Teste 3 — 14:43 (após `#fim` + `#crm`):**
+
+| # | Hora | Mensagem cliente | Resposta bot |
+|---|------|------------------|--------------|
+| 1 | 14:43 | `#fim` | Atendimento concluído |
+| 2 | 14:43 | `#crm` | (reinicia) |
+| 3 | 14:43 | "Quanto custa esse chatbot de IA?" | ✅ **RESPOSTA COMPLETA** |
+
+**Bot Ygor-OTIMIZE respondeu (14:43):**
+> Ygor: Oi! Vi que você falou com a IA do Empório antes comigo 😊
+>
+> (OT_Quer_Sistema)
+>
+> Pra eu te indicar o melhor jeito de usar **CRM + WhatsApp + IA 24h** aí no seu caso, me diz rapidinho:
+> qual é o seu negócio?
+> Ex.: loja de moda, fábrica, clínica, prestação de serviço...
+> e se vende mais no **WhatsApp/Instagram** ou em **marketplace**?
+
+**Validação:**
+- ✅ Show-don't-tell ativo (referência ao Ygor-Empório anterior — converte estratégia de vendas em mensagem)
+- ✅ Aplicou APENAS `OT_Quer_Sistema` (filtrou, não as 8 etiquetas!)
+- ✅ Estágio 1 Diagnóstico executou (perguntou negócio + canal vendas)
+- ✅ Persona Ygor consistente
+- ✅ Etiqueta visível inline `(OT_Quer_Sistema)` — opcional ocultar depois
+
+**Pattern de fix replicar em todas as 14 habilidades restantes:**
+- Empório: Etiquetas + Concluir + Transferir + Informações (4)
+- OTIMIZE: Concluir + Transferir + Criar card CRM (3 — Etiquetas já fixada nesta sessão)
+- Supervisor: Etiquetas + Concluir + Transferir + outras (4-6)
+
+Cada habilidade leva ~2min: abrir → desmarcar Execução Silenciosa → reescrever Definição → salvar.
+
 ---
 
 ## 4. Próxima sessão — instruções
