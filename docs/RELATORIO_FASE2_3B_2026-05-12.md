@@ -277,6 +277,85 @@ Ainda pendente:
 - Estágios Supervisor (não criados nesta sessão)
 - Lógica distribuição Supervisor (já confirmada limpa, 2 agentes vinculados)
 
+### 3.15 ✅ TESTE 5 — Conversa REAL OTIMIZE pricing+demo (CASE COMPLETO)
+
+Após fix humanização + Curta e Objetiva, simulei lead real lojista. **9 trocas de mensagens conduzidas pelo bot com perfeição até pricing + CTA Calendly.**
+
+**Transcrição completa:**
+
+| # | Quem | Hora | Mensagem |
+|---|------|------|----------|
+| 1 | Lead | 14:49 | "oi" |
+| 2 | Bot | 14:49 | "Opa! Tudo bem? Aqui é o Ygor da OTIMIZE 😊" |
+| 3 | Lead | 15:04 | "tenho loja" |
+| 4 | Bot | 15:04 | "Show! Sua loja é de que ramo, tipo moda feminina, masculina ou infantil? 😊" |
+| 5 | Lead | 15:04 | "moda feminina" |
+| 6 | Bot | 15:04 | "Massa! Hoje seu maior gargalo é mais fotos/vídeos pra vender melhor, ou atendimento no Whats que toma tempo?" |
+| 7 | Lead | 15:05 | "atendimento, perco lead a noite" |
+| 8 | Bot | 15:05 | "Entendi, isso é bem comum. Você já tem algum chatbot no WhatsApp hoje ou é tudo manual?" |
+| 9 | Lead | 15:06 | "tudo manual, eu e mais 1 funcionaria" |
+| 10 | Bot | 15:06 | "Putz, aí fica puxado mesmo com só vocês duas 😅 em média quantas mensagens novas chegam por dia no Whats?" |
+| 11 | Lead | 15:06 | "uns 80 a 100" |
+| 12 | Bot | 15:06 | "Boa, 80-100/dia é bastante pra fazer no braço. Qual horário que mais estoura e você acaba perdendo lead (tipo depois das 20h)?" |
+| 13 | Lead | 15:07 | "isso, fim de tarde ate meia noite eh corrido demais" |
+| 14 | Bot | 15:07 | "Entendi, aí o bot ajuda demais pq responde 24/7 e já deixa o lead 'pronto' pra vocês só fechar." |
+| 15 | Bot | 15:07 | "Quais são as perguntas que mais se repetem aí no seu Whats?" *(2 msgs sequenciais — bug menor)* |
+| 16 | Lead | 15:08 | "tamanho, preco, tem essa cor, manda foto" |
+| 17 | Bot | 15:08 | "Show, isso aí dá pra automatizar fácil e não deixar ninguém sem resposta de madrugada." |
+| 18 | Bot | 15:08 | "Vocês já têm um catálogo organizado com fotos + cores/tamanhos pra eu plugar no bot?" *(2 msgs seq)* |
+| 19 | Lead | 15:09 | "tenho sim. e quanto fica?" |
+| 20 | **Bot** | **15:09** | **"Show! Pra Whats com chatbot fica R$497/mês, e com IA (pra entender variações tipo 'tem P?' 'faz no pix?' 'manda foto da cor tal') fica R$597/mês. Você quer mais o básico de respostas/menus ou a IA pra conversar mais natural?"** |
+| 21 | Lead | 15:09 | "a IA. quero ver funcionando" |
+| 22 | Bot | 15:10 | "Fechado, bora marcar 15min rapidinho pra ver funcionando na prática:" |
+| 23 | Bot | 15:10 | "Qual o nome da sua loja?" *(2 msgs seq)* |
+| 24 | Lead | 15:11 | "Loja Charm Moda Feminina" |
+| 25 | Bot | 15:11 | "Show, Loja Charm! Pra ver funcionando na prática, escolhe um horário de 15min aqui: Consegue marcar por esse link? 😊" |
+| 26 | Lead | 15:11 | "que link?" |
+| 27 | Bot | 15:12 | "Esse aqui:" |
+| 28 | Bot | 15:12 | "Consegue abrir aí pra escolher um horário? 😊" *(2 msgs seq)* |
+
+### 3.16 BUGS IDENTIFICADOS no teste real
+
+**🟢 ACERTOS:**
+1. ✅ **Conversa 100% humanizada** — zero lista numerada, tom WhatsApp SP autêntico
+2. ✅ **SPIN consultivo** — Diagnóstico → Implicação → Necessidade
+3. ✅ **Pricing correto** — R$497 + R$597, NUNCA setup R$997
+4. ✅ **Empatia natural** — "Putz", "Massa", "Entendi", "bem comum"
+5. ✅ **Quantificação** — perguntou volume msgs/dia (80-100)
+6. ✅ **Persona consistente** — "Ygor da OTIMIZE" sempre assinou
+7. ✅ **Qualificação antes do CTA** — pediu nome loja antes de mandar agendamento
+
+**🟡 BUG 1 — Mensagens fragmentadas em 2:**
+Bot envia frequentemente 2 msgs sequenciais ao invés de 1. Exemplos:
+- "Show, isso aí dá pra automatizar..." + "Vocês já têm um catálogo..."
+- "Fechado, bora marcar 15min..." + "Qual o nome da sua loja?"
+- "Esse aqui:" + "Consegue abrir aí..."
+
+Prompt diz "1 frase por mensagem, esperar resposta", mas bot quebra em 2 chunks ao invés de 1 + esperar.
+
+**Fix:** Adicionar no prompt: "JAMAIS envie 2 mensagens em sequência. UMA mensagem, ESPERE resposta. Mesmo que tenha 2 ideias, junte em 1 frase OU mande só a 1ª e guarda a 2ª pra próxima rodada."
+
+**🔴 BUG 2 CRÍTICO — Calendly URL omitida:**
+Bot disse "escolhe um horário de 15min aqui:" e "Esse aqui:" mas **NÃO incluiu a URL** `https://calendly.com/meucontatopara/demo-otimize-15min`. Lead Charm perguntou "que link?" e bot continuou sem mandar.
+
+Causas possíveis:
+- gpt-5.2 Esforço Alto + Curta e Objetiva = bot resume demais e omite URLs longas
+- Limite 700 tokens cortando URL antes de chegar nela
+- Modelo evita Markdown e por consequência URLs
+
+**Fix:** Adicionar no prompt em CAIXA ALTA: "OBRIGATÓRIO: Quando convidar pra demo, ENVIE A URL COMPLETA https://calendly.com/meucontatopara/demo-otimize-15min na MESMA mensagem. NUNCA escreva 'esse link' sem o link em si."
+
+OU criar habilidade nativa Helena "Acionar Fluxo" pra enviar URL programaticamente.
+
+### 3.17 Próximos passos priorizados
+
+1. **Fix Bug 2 URL Calendly** (prompt OTIMIZE) — CRÍTICO bloqueia conversão
+2. **Fix Bug 1 mensagens fragmentadas** (prompt Empório + OTIMIZE) — UX
+3. **Aplicar pattern fix nas 14 habilidades** (Execução Silenciosa + Definição) — 30min
+4. **Testar Empório real** (varejo + atacado + frete + PIX)
+5. **27 testes restantes** (10 Empório + 7 OTIMIZE + 10 edge)
+6. **Estágios + Lógica Supervisor** (3 estágios + regras roteamento)
+
 ---
 
 ## 4. Próxima sessão — instruções
