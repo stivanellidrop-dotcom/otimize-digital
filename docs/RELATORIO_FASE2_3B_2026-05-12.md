@@ -119,7 +119,53 @@ Ocorreu entre msg #2 e #3. Sistema/API transferiu de "Geral para Geral" às 12:5
 **Workaround:** próxima sessão deve testar em **conversa NOVA** (não reusar Igor Stivanelli existente). Helena chatbot só dispara fluxo no primeiro contato de uma conversa.
 
 ### 3.6 Testes não executados
-Plano: 30 testes (10 Empório + 10 OTIMIZE + 10 edge). **Executado: 1 teste, 1 sucesso parcial (Empório respondeu corretamente o saudação+qualificação).** 29 pendentes.
+Plano: 30 testes (10 Empório + 10 OTIMIZE + 10 edge). **Executado: 2 testes (Empório + OTIMIZE)**. 28 pendentes.
+
+### 3.7 Teste 2 — OTIMIZE pitch (revelou BUG RAIZ)
+
+**Sequência após `#fim` + `#crm` + atendimento concluído manualmente via admin:**
+| # | Hora | Mensagem | Bot |
+|---|------|----------|-----|
+| 1 | 14:34 | `#crm` (reativar) | (acionou chatbot - nova sessão criada) |
+| 2 | 14:34 | "Oi, vi seu anúncio sobre IA pra WhatsApp. Quero entender" | ❌ Aplicou etiquetas, NÃO enviou texto |
+
+**Detalhes da habilidade executada (via admin):**
+- Realizado: 12/05/2026 14:34
+- Ação: Adicionar etiquetas
+- 8 etiquetas aplicadas de uma vez: `OT_AGUARDA_HUMANO`, `OT_CLIENTE_OTIMIZE`, `OT_DEMO_MARCADA`, `OT_LEAD_ORGANICO`, `OT_LEAD_TRAFEGO`, `OT_QUER_SISTEMA`, `OT_REATIVAR_30D`, `OT_SPAM`
+
+**🔴 BUG RAIZ identificado:**
+1. **Supervisor rotou corretamente** (palavras "IA"/"WhatsApp"/"anúncio" → Ygor-OTIMIZE-Systems) ✓
+2. **Habilidade "Etiquetas do contato" tem flag "Executar sem responder ao cliente" MARCADA** (Execução Silenciosa V.07)
+3. **Definição genérica padrão Helena** = bot aplica TODAS as etiquetas relevantes ao invés de filtrar
+4. **Bot terminou sem enviar texto** porque considerou tarefa finalizada após etiquetar (modo silencioso)
+
+**Causa raiz:** Habilidades nativas Helena vêm com flag "Não enviar resposta após execução" MARCADA por padrão (V.07 introduziu Execução Silenciosa). Empório no Teste 1 funcionou porque a habilidade "Informações do contato" executou + agente continuou gerando texto. OTIMIZE pegou só Etiquetas que silencia output.
+
+### 3.8 Fix necessário próxima sessão
+
+**Edição em massa nas habilidades dos 3 agentes:**
+1. Abrir cada habilidade (clique na linha do item) - todas em `/ai/<UUID>/edit` aba Comportamento
+2. Scrollar até final do modal de cada habilidade
+3. **DESMARCAR** checkbox "Executar sem responder ao cliente" / "Não enviar resposta após execução"
+4. Reescrever **Descrição de uso específica** ao invés de genérica:
+   - **Etiquetas (Empório):** "Aplicar APENAS: `Empório_Atacado` se cliente menciona 6+ peças ou R$300+, `Empório_Varejo` caso contrário, `Empório_Interessou` se pediu mais info. Nunca aplicar etiquetas OT_*."
+   - **Etiquetas (OTIMIZE):** "Aplicar APENAS: `OTIMIZE_Interessado` quando mencionar produto/IA/chatbot. `OTIMIZE_Qualificado` se tem loja física+online confirmada. NUNCA aplicar todas as 8 OT_* de uma vez."
+   - **Concluir (ambos):** "Concluir SOMENTE após cliente confirmar compra (Empório) ou agendar demo via Calendly (OTIMIZE). Nunca concluir após primeira mensagem."
+   - **Transferir (ambos):** "Transferir apenas quando: cliente pede falar com humano explicitamente, reclama 2x, ou pergunta fora do escopo."
+   - **Informações (Empório):** "Capturar nome+cidade no início. Não pedir CPF/CNPJ/telefone."
+
+5. Salvar cada habilidade (botão Salvar)
+6. Re-testar via WhatsApp com `#fim` + `#crm` + nova mensagem
+
+### 3.9 Bug pontual ainda não resolvido (não-bloqueador)
+- Conversa Igor Stivanelli original tinha erro `Agente c367ccd5 arquivado` - resolvido concluindo manualmente via admin. Novas conversas após `#fim`+`#crm` funcionam sem o erro.
+- Erro provavelmente foi cache de sessão antiga, não fluxo atual.
+
+### 3.10 Como reiniciar testes (instrução Igor)
+- `#fim` → encerra conversa atual
+- `#crm` → reinicia novo atendimento via chatbot
+- Se conversa travar: ir Atendimentos admin → conversa → Concluir → voltar WhatsApp + `#crm`
 
 ---
 
