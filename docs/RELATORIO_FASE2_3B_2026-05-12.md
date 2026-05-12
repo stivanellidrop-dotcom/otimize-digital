@@ -455,10 +455,40 @@ Próxima sessão deve re-testar pra validar fix.
 - Chatbot publicado
 
 🟡 **Pendente próxima sessão:**
-- Bug 2 URL Calendly (4 alternativas listadas)
-- Estágios Supervisor (3)
+- Bug 2 URL Calendly: 75% feito (falta drag manual no Builder)
 - 27 testes restantes
 - Validação visual habilidades individuais Empório
+
+### 3.23 Bug 2 fix progresso (75%) — Plano B Acionar Fluxo
+
+**Implementado:**
+- ✅ Pesquisa docs Helena — achei habilidade "Acionar Fluxo do Chatbot"
+- ✅ Criado Chatbot Automação "Calendly Link OTIMIZE" (`40352872-9e37-4ca1-8160-9321fce7e4d7`) com URL inline:
+  > Bora marcar 15min pra ver funcionando na pratica:
+  > https://calendly.com/meucontatopara/demo-otimize-15min
+  > Consegue marcar por esse link? 😊
+- ✅ Publicado
+- ✅ Adicionada habilidade "Enviar Link Calendly" no Ygor-OTIMIZE com definição específica
+- ✅ Refresh agente OTIMIZE no Builder — habilidade aparece no card
+
+**Pendente (manual Igor 1 click):**
+- 🟡 Builder CRM-SDR YGOR: conectar saída `enviar_link_calendly` do agente OTIMIZE ao nó alvo (drag visual)
+- 🟡 Re-publicar chatbot CRM-SDR YGOR
+
+### 3.24 Estágios Supervisor — IMPLEMENTADO ✓
+
+Supervisor não tem aba Comportamento (não tem estágios da conversa tradicional). Solução: 3 estágios de DECISÃO no objetivo:
+
+```
+ESTAGIO 1 - RECEBE: Lê primeira msg, identifica palavras-chave + intenção
+ESTAGIO 2 - DECIDE rota:
+  - MODA/ATACADO/VAREJO/PRODUTO/etc → Ygor-Emporio-Stivanelli
+  - IA/CHATBOT/CRM/SaaS/OTIMIZE/etc → Ygor-OTIMIZE-Systems
+  - Ambíguas ('oi','tudo bem') → Empório (default - anúncios)
+ESTAGIO 3 - ACIONA: Encaminha SILENCIOSAMENTE, sub-agente assume
+```
+
+NUNCA: falar com cliente / aplicar etiquetas / 2 msgs / mudar rota meio.
 
 ---
 
