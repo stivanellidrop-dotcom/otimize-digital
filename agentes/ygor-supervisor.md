@@ -338,3 +338,13 @@ O Supervisor referencia `Ygor — Suporte` como terceiro sub-agente, mas o arqui
 4. **Custo:** Supervisor consome 1 slot de agente (doc Helena: "Esse número engloba agentes e supervisores"). Igor precisa garantir que o plano contratado cobre slot adicional ou aumentar.
 
 5. **A/B test antes de 100%:** ideal subir Supervisor pra 20% do tráfego (via tag de roteamento no Builder) na semana 1, comparar conversão vs fluxo atual sem Supervisor. Se ganhar, escalar pra 100%.
+
+---
+
+## Mudança Modelo Negócio (atualizado 2026-05-12)
+
+- **Sem teste grátis de 7 dias.**
+- CTA único: lead testa chamando no WhatsApp (11) 97820-2286 — número API Oficial onde os 3 agentes Ygor estão rodando.
+- Lead vivencia o agente como cliente da loja Empório. Quando demonstra interesse, agente OTIMIZE entra com pitch.
+- Preço R$ 597/mês (chatbot + IA combo) e R$ 497/mês (só chatbot). Sem desconto temporário.
+- Escassez genuína: 2 setups novos por semana (capacidade real Igor).

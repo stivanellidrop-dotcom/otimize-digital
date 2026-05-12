@@ -289,3 +289,13 @@ Ao receber uma pergunta do lead sobre PRODUTO, PREÇO, TAMANHO, MATERIAL, ENVIO 
 - **Frequência sugerida:** quinzenal (Igor revisa preços, estoque, peças novas).
 - **Como atualizar:** editar este `.md` no repositório `OTIMIZE/agentes/`, fazer upload novamente na aba Base de Conhecimento da Helena (substitui a versão anterior).
 - **Antes de subir:** validar campos ESTIMATIVA com Igor. Marcar como CONFIRMADO depois de validados.
+
+---
+
+## Mudança Modelo Negócio (atualizado 2026-05-12)
+
+- **Sem teste grátis de 7 dias.**
+- CTA único: lead testa chamando no WhatsApp (11) 97820-2286 — número API Oficial onde os 3 agentes Ygor estão rodando.
+- Lead vivencia o agente como cliente da loja Empório. Quando demonstra interesse, agente OTIMIZE entra com pitch.
+- Preço R$ 597/mês (chatbot + IA combo) e R$ 497/mês (só chatbot). Sem desconto temporário.
+- Escassez genuína: 2 setups novos por semana (capacidade real Igor).
