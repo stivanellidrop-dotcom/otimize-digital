@@ -347,14 +347,50 @@ Causas possíveis:
 
 OU criar habilidade nativa Helena "Acionar Fluxo" pra enviar URL programaticamente.
 
-### 3.17 Próximos passos priorizados
+### 3.17 ✅ TESTE 6 — Empório humanizado conversa real
 
-1. **Fix Bug 2 URL Calendly** (prompt OTIMIZE) — CRÍTICO bloqueia conversão
-2. **Fix Bug 1 mensagens fragmentadas** (prompt Empório + OTIMIZE) — UX
-3. **Aplicar pattern fix nas 14 habilidades** (Execução Silenciosa + Definição) — 30min
-4. **Testar Empório real** (varejo + atacado + frete + PIX)
-5. **27 testes restantes** (10 Empório + 7 OTIMIZE + 10 edge)
-6. **Estágios + Lógica Supervisor** (3 estágios + regras roteamento)
+Após fix humanização Empório:
+
+**Sequência (15:15-15:17):**
+| # | Lead | Bot |
+|---|------|-----|
+| 1 | "oi tem vestido floral" | "Oi! Tudo bem? Aqui é o Ygor do Empório Stivanelli 😊 Qual seu nome?" |
+| 2 | "Maria, de Curitiba" | "Show, Maria! 😊 Vc tá comprando pra varejo ou atacado?" |
+| 3 | "atacado, tenho loja" | "Aí sim, Maria! 😊 O que vc tá procurando mais pra sua loja hoje?" |
+| 4 | "vestido longo floral, umas 10 pecas" | "Perfeito, Maria! 😊 No atacado o mínimo é 6 peças ou R$300, fechou!" + "Qual grade de tamanhos vc quer nessas 10 (P/M/G/GG)?" *(2 msgs - bug 1)* |
+
+**Acertos Empório:**
+- ✅ Saudação curta humanizada (não 8 perguntas numeradas)
+- ✅ Personalizou com nome ("Show, Maria!")
+- ✅ Linguagem natural ("vc", "tá")
+- ✅ Confirmou regra atacado 6/R$300 quando lead sinalizou 10 peças
+- ✅ Não despejou catálogo, qualificou primeiro
+
+**Bug 1 persiste:** 2 msgs seguidas em rodada 4. Mesmo bug que OTIMIZE.
+
+### 3.18 ✅ FIX Bug 1 + Bug 2 aplicados em AMBOS prompts
+
+**OTIMIZE prompt v2 (após teste 5):**
+- ✅ Adicionada REGRA CRÍTICA "JAMAIS envie 2 msgs em sequência"
+- ✅ Adicionada REGRA CRÍTICA "OBRIGATÓRIO Calendly URL completa na mesma mensagem"
+- ✅ Exemplo correto com URL inline incluído
+- ✅ Lista "O QUE NUNCA FAZER" expandida com "esse link sem URL" e "2 msgs seguidas"
+
+**Empório prompt v2 (após teste 6):**
+- ✅ Adicionada REGRA CRÍTICA "JAMAIS envie 2 msgs em sequência"
+- ✅ "Se tiver 2 ideias, junte em 1 frase OU mande só a 1ª e guarda a 2ª pra próxima rodada"
+- ✅ Lista NUNCA expandida com "2 msgs seguidas (REGRA CRÍTICA)"
+
+Próxima sessão deve re-testar pra validar fix.
+
+### 3.19 Próximos passos priorizados próxima sessão
+
+1. **Validar fix Bug 1 + Bug 2** — testar OTIMIZE+Empório, verificar se bot manda 1 msg/turno e inclui URL Calendly
+2. **Aplicar pattern fix nas 14 habilidades restantes** (Execução Silenciosa + Definição) — 30min
+3. **Testar varejo Empório + frete + PIX**
+4. **27 testes restantes** (10 Empório + 7 OTIMIZE + 10 edge)
+5. **Estágios + Lógica Supervisor** (3 estágios + regras roteamento)
+6. **Possível**: criar habilidade "Acionar Fluxo" pra enviar URL Calendly programaticamente
 
 ---
 
