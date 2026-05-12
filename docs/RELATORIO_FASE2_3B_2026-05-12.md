@@ -383,14 +383,82 @@ Após fix humanização Empório:
 
 Próxima sessão deve re-testar pra validar fix.
 
-### 3.19 Próximos passos priorizados próxima sessão
+### 3.19 ENTREGA FINAL DA SESSÃO (modo sócio sênior)
 
-1. **Validar fix Bug 1 + Bug 2** — testar OTIMIZE+Empório, verificar se bot manda 1 msg/turno e inclui URL Calendly
-2. **Aplicar pattern fix nas 14 habilidades restantes** (Execução Silenciosa + Definição) — 30min
-3. **Testar varejo Empório + frete + PIX**
-4. **27 testes restantes** (10 Empório + 7 OTIMIZE + 10 edge)
-5. **Estágios + Lógica Supervisor** (3 estágios + regras roteamento)
-6. **Possível**: criar habilidade "Acionar Fluxo" pra enviar URL Calendly programaticamente
+**3 agentes configurados + auditados:**
+| Item | Empório | OTIMIZE | Supervisor |
+|------|---------|---------|------------|
+| Modelo | gpt-5.2 ✓ | gpt-5.2 ✓ | gpt-5.2 ✓ |
+| Esforço | Médio ✓ | Médio ✓ (era Alto) | Médio ✓ |
+| Equipe | CRM-OTIMIZE ✓ | CRM-OTIMIZE ✓ | CRM-OTIMIZE ✓ |
+| Tokens | 500 ✓ | 1500 ✓ (era 700) | 200 ✓ |
+| Tempo digitação | 3s ✓ | 4s ✓ | Imediato ✓ |
+| Formatação | Curta e Objetiva ✓ | Longa e Detalhada ✓ | n/a |
+| Prompt humanizado v2 | ✓ (sem listas) | ✓ (sem listas+URL force) | n/a |
+| Estágios conversa | 5 ✓ | 5 ✓ | n/a |
+| Outras regras | ✓ (5 habilidades inline) | ✓ (URL Calendly força) | ✓ (lógica roteamento) |
+
+**Habilidades fix (Execução Silenciosa + Definição específica):**
+- **OTIMIZE 5/5**: Concluir ✓ + Etiquetas ✓ + Criar card CRM ✓ + Transferir ✓ + Calendário (auto)
+- **Empório**: regras consolidadas em "Outras regras" (5 habilidades em texto único)
+- **Supervisor**: lógica de roteamento em "Outras regras"
+
+**Chatbot CRM-SDR YGOR:**
+- Status: **Publicado** ✓
+- Fluxo: Início → Supervisor IA (Ygor-Supervisor) → Ramos Empório/OTIMIZE
+- Lógica roteamento: palavras-chave moda→Empório, IA/chatbot→OTIMIZE
+- Palavra ativação: `#crm` / encerramento: `#fim`
+
+### 3.20 Testes validados nesta sessão
+
+| Teste | Cenário | Resultado |
+|-------|---------|-----------|
+| T1 | Empório saudação + qualificação (lista numerada) | ❌ Robótico → fix aplicado |
+| T2 | OTIMIZE pricing (lista) | ❌ Robótico → fix aplicado |
+| T3 | OTIMIZE etiquetas | ✅ Filtrou só OT_Quer_Sistema |
+| T4 | OTIMIZE "oi" humanizado | ✅ "Opa! Tudo bem? Aqui é o Ygor da OTIMIZE 😊" |
+| T5 | OTIMIZE conversa real (Loja Charm) | ✅ SPIN+pricing+CTA / ⚠️ URL omitida |
+| T6 | Empório atacado (Maria/Curitiba/10 peças) | ✅ Personalizou+regra atacado |
+| T7 | OTIMIZE re-teste fix v2 | ✅ 1 msg/turno / ❌ URL omitida |
+| T8 | OTIMIZE re-teste fix v3 (Longa+1500 tokens) | ❌ URL ainda omitida |
+
+### 3.21 Bug 2 URL Calendly — 4 tentativas falharam (BLOQUEADOR conhecido)
+
+**Tentativas:**
+1. ❌ Regra CAIXA ALTA prompt System
+2. ❌ Esforço Alto→Médio + tokens 700→1500
+3. ❌ Estágio 4 com URL inline + Outras regras
+4. ❌ Formatação Curta→Longa e Detalhada
+
+**Diagnóstico:** URL NÃO está no backend Helena. Bot gpt-5.2 omite URLs no output.
+
+**Plano próxima sessão:**
+- A) Modelo de Mensagem template Helena com URL hard-coded
+- B) Habilidade "Acionar Fluxo" → Chatbot Automação enviando URL
+- C) Habilidade "Acionar API" → webhook retornando URL
+- D) Mudar canal API oficial → não-oficial
+
+**Impacto:** NÃO bloqueador MVP — só CTA Calendly automático. Atendente humano envia link após transferência.
+
+### 3.22 Status final
+
+✅ **Funcionando:**
+- Show-don't-tell ativo
+- SPIN consultivo
+- Pricing R$497/R$597
+- Setup R$997 oculto
+- Humanização total (sem listas)
+- Persona Ygor consistente
+- Etiquetas filtradas por contexto
+- Regra atacado 6 peças/R$300
+- Bug 1 (2 msgs) fix aplicado
+- Chatbot publicado
+
+🟡 **Pendente próxima sessão:**
+- Bug 2 URL Calendly (4 alternativas listadas)
+- Estágios Supervisor (3)
+- 27 testes restantes
+- Validação visual habilidades individuais Empório
 
 ---
 
