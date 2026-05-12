@@ -205,6 +205,78 @@ Após aplicar fix na habilidade "Etiquetas do contato" de Ygor-OTIMIZE-Systems:
 
 Cada habilidade leva ~2min: abrir → desmarcar Execução Silenciosa → reescrever Definição → salvar.
 
+### 3.12 🔴 BUG CRÍTICO 2: bot robótico (listas numeradas) — FIX APLICADO
+
+**Feedback Igor:** "nenhum atendimento humano manda msgs numeradas e nenhum cliente responde todas as respostas em uma frase só, isso precisa ser um simulado real, comportamento humano de lead futuro cliente com situações reais"
+
+**Bug observado bot Empório original:**
+> Pra eu te mandar as opções certinhas com fotos + tamanhos e valores, me fala rapidinho:
+> 1) Seu nome e cidade/UF?
+> 2) É compra varejo ou atacado?
+> 3) Qual seu tamanho?
+> 4) Você prefere mais soltinho ou mais acinturado?
+> E é pra dia a dia, festa ou praia?
+
+8 perguntas + Markdown bold + lista numerada. ZERO conversacional. Cliente real WhatsApp manda "oi" "tem floral?" "GG?" fragmentado.
+
+**Fix aplicado em Empório + OTIMIZE (prompt completo reescrito):**
+- ✅ Formatação mudada: Automático → **Curta e Objetiva**
+- ✅ Prompt System reescrito com **REGRA DE OURO sem exceção**:
+  - UMA pergunta por vez. NUNCA lista 1) 2) 3)
+  - Mensagem 1-2 frases max
+  - Linguagem WhatsApp SP informal: 'opa', 'show', 'firmeza', 'massa'
+  - Espelhar ritmo do lead (curto → curto)
+  - Esperar resposta antes de próxima pergunta
+  - 1 emoji max por mensagem
+  - SEM Markdown bold/itálico
+  - SEM bullets
+
+**Empório novo prompt (resumo):**
+> Saudação: 'Oi! Tudo bem? Aqui é o Ygor do Empório Stivanelli 😊' → ESPERA → 'Qual seu nome?' → ESPERA → 'Show, Maria! De onde você é?' → ESPERA → 'Beleza, e o que tá procurando hoje?'
+
+**OTIMIZE novo prompt (resumo):**
+> Saudação: 'Opa! Tudo bem? Aqui é o Ygor da OTIMIZE 😊' → ESPERA → 'Você já tem chatbot rodando ou não?' → ESPERA → 'Show, e qual o ramo da sua loja?' → ESPERA
+
+### 3.13 ✅ TESTE 4 — VALIDAÇÃO HUMANIZAÇÃO
+
+Após fix humanização + Curta e Objetiva nos prompts:
+
+**Sequência (14:49):**
+| # | Hora | Mensagem | Bot |
+|---|------|----------|-----|
+| 1 | 14:49 | `#fim` | Atendimento concluído |
+| 2 | 14:49 | `#crm` | reinicia |
+| 3 | 14:49 | "oi" | ✅ **Opa! Tudo bem? Aqui é o Ygor da OTIMIZE 😊** |
+
+**Validação:**
+- ✅ Resposta curta (1 frase)
+- ✅ Tom informal SP ("Opa! Tudo bem?")
+- ✅ 1 emoji
+- ✅ Assinou persona ("Ygor da OTIMIZE")
+- ✅ Espelhou ritmo do lead (lead mandou "oi" curtinho → bot respondeu curtinho)
+- ✅ Esperou cliente responder (não despejou pitch)
+- ✅ ZERO lista numerada
+
+**Comparação ANTES vs DEPOIS:**
+
+| Aspecto | ANTES (Teste 1) | DEPOIS (Teste 4) |
+|---------|-----------------|------------------|
+| Tamanho | 7 linhas + 8 perguntas | 1 linha |
+| Formato | Lista numerada 1) 2) 3) 4) | Frase única |
+| Markdown | **bold** em vários trechos | Texto cru |
+| Emojis | 1 emoji + 1 caixa 📦 | 1 emoji |
+| Comportamento | Despejou tudo de uma vez | Saudou + esperou |
+| Tom | Profissional formal | Informal WhatsApp SP |
+
+### 3.14 Trabalho restante próxima sessão
+
+Ainda pendente:
+- **14 habilidades** com Execução Silenciosa MARCADA (só Etiquetas OTIMIZE fixada esta sessão)
+- **27 testes** restantes (10 cenários Empório varejo+atacado, 7 cenários OTIMIZE pricing/demo, 10 edge cases)
+- Possíveis ajustes finos: bot ainda mostra `(OT_Quer_Sistema)` inline — talvez ocultar via config?
+- Estágios Supervisor (não criados nesta sessão)
+- Lógica distribuição Supervisor (já confirmada limpa, 2 agentes vinculados)
+
 ---
 
 ## 4. Próxima sessão — instruções
